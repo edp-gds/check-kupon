@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Checker Kupon Undian</title>
-<!-- Theme color untuk PWA -->
 <meta name="theme-color" content="#7c3aed">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -26,8 +25,8 @@
   #app.dark .topbar-clock{color:rgba(255,255,255,0.45);}
   #app.dark .topbar-title{color:#fff;}
   #app.dark .topbar-title span{color:#a78bfa;}
-  #app.dark .mode-btn, #app.dark .fullscreen-btn{color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.12);}
-  #app.dark .mode-btn:hover, #app.dark .fullscreen-btn:hover{color:#fff;background:rgba(255,255,255,0.13);}
+  #app.dark .mode-btn, #app.dark .fullscreen-btn, #app.dark .install-btn{color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.12);}
+  #app.dark .mode-btn:hover, #app.dark .fullscreen-btn:hover, #app.dark .install-btn:hover{color:#fff;background:rgba(255,255,255,0.13);}
   #app.dark .scan-panel{background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.08);}
   #app.dark .scan-input{background:rgba(0,0,0,0.4);border-color:rgba(255,255,255,0.15);color:#fff;}
   #app.dark .scan-input::placeholder{color:rgba(255,255,255,0.2);}
@@ -79,13 +78,13 @@
   #app.light .topbar-clock{color:rgba(50,30,110,0.65);}
   #app.light .topbar-title{color:#1e0d5c;}
   #app.light .topbar-title span{color:#7c3aed;}
-  #app.light .mode-btn, #app.light .fullscreen-btn{
+  #app.light .mode-btn, #app.light .fullscreen-btn, #app.light .install-btn{
     color:rgba(50,30,110,0.7);
     background:rgba(255,255,255,0.4);
     border-color:rgba(255,255,255,0.75);
     backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   }
-  #app.light .mode-btn:hover, #app.light .fullscreen-btn:hover{background:rgba(255,255,255,0.65);color:#1e0d5c;}
+  #app.light .mode-btn:hover, #app.light .fullscreen-btn:hover, #app.light .install-btn:hover{background:rgba(255,255,255,0.65);color:#1e0d5c;}
   #app.light .scan-panel{
     background:rgba(255,255,255,0.22);
     backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
@@ -139,7 +138,7 @@
   .topbar-clock{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:1px;}
   .topbar-title{font-size:14px;font-weight:800;letter-spacing:3px;text-transform:uppercase;}
   .topbar-buttons{display:flex;gap:8px;}
-  .mode-btn, .fullscreen-btn{
+  .mode-btn, .fullscreen-btn, .install-btn{
     font-family:'DM Mono',monospace;
     font-size:16px;
     padding:5px 12px;
@@ -237,6 +236,7 @@
     <div class="topbar-clock" id="clock">--/--/---- --:--:--</div>
     <div class="topbar-title">Checker <span>Kupon</span> Undian</div>
     <div class="topbar-buttons">
+      <button class="install-btn" id="installBtn" style="display:none;">📲 Install</button>
       <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶</button>
       <button class="mode-btn" onclick="toggleTheme()">🌓</button>
     </div>
@@ -259,7 +259,7 @@
       </div>
       <div class="toolbar-right">
         <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
-        <button class="upload-btn" id="uploadBtn" onclick="document.getElementById('fileInput').click()">Upload Data Hadiah</button>
+        <button class="upload-btn" id="uploadBtn" onclick="document.getElementById('fileInput').click()">Upload DB</button>
         <button class="export-btn" onclick="exportExcel()">Export Pemenang</button>
       </div>
     </div>
@@ -329,7 +329,7 @@
   loadStorage();
   if (Object.keys(couponDB).length > 0) {
     const btn = document.getElementById('uploadBtn');
-    btn.textContent = '✓ ' + Object.keys(couponDB).length + ' Hadiah';
+    btn.textContent = '✓ ' + Object.keys(couponDB).length + ' Kupon';
     btn.classList.add('loaded');
   }
   updateQueueBadge();
@@ -459,7 +459,7 @@
           <td class="waktu-col">${h.waktu}</td>
           <td class="kupon-col">${h.code}</td>
           <td class="hadiah-col">${h.prize}</td>
-        </tr>`;
+         </tr>`;
     }).join('');
   }
 
@@ -500,15 +500,14 @@
     }
   }
 
-  // ========== BAGIAN PWA: Manifest & Service Worker (dinamis) ==========
+  // ========== PWA: Manifest + Service Worker + Tombol Install Manual ==========
   (function initPWA() {
-    // Hanya berjalan di lingkungan secure (localhost/https) agar service worker dapat terdaftar
     if (location.protocol === 'file:') {
       console.warn('PWA tidak dapat diinstall karena dijalankan via file://. Gunakan localhost atau HTTPS.');
       return;
     }
 
-    // ---- 1. Buat manifest blob ----
+    // --- Buat manifest blob dan pasang ---
     const manifestObj = {
       name: "Checker Kupon Undian",
       short_name: "CheckerKupon",
@@ -537,7 +536,7 @@
     manifestLink.href = manifestURL;
     document.head.appendChild(manifestLink);
 
-    // ---- 2. Service worker dengan cache offline ----
+    // --- Service Worker sederhana (cache offline) ---
     const swScript = `
       const CACHE_NAME = 'kupon-checker-v1';
       const urlsToCache = [
@@ -587,6 +586,24 @@
         console.warn('Gagal daftar service worker:', err);
       });
     }
+
+    // --- Tangkap event beforeinstallprompt untuk menampilkan tombol install manual ---
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const installBtn = document.getElementById('installBtn');
+      if (installBtn) installBtn.style.display = 'flex';
+    });
+
+    document.getElementById('installBtn')?.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to install: ${outcome}`);
+      deferredPrompt = null;
+      document.getElementById('installBtn').style.display = 'none';
+    });
   })();
 </script>
 </body>

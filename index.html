@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Checker Kupon Undian</title>
 <meta name="theme-color" content="#7c3aed">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   * {
@@ -39,13 +38,6 @@
     overflow: hidden;
   }
 
-  /*
-    FIX ZOOM:
-    #app diberi transform-origin top left.
-    Zoom dilakukan via CSS transform: scale() pada #app,
-    bukan body.style.zoom yang menyebabkan body membesar dan memunculkan scrollbar browser.
-    .app-scale-wrapper memastikan overflow tetap terpotong.
-  */
   .app-scale-wrapper {
     width: 100vw;
     height: 100vh;
@@ -55,12 +47,17 @@
     left: 0;
   }
 
+  :root {
+    --font-ui: 'Segoe UI', 'Arial', sans-serif;
+    --font-mono: 'Consolas', 'Courier New', monospace;
+  }
+
   #app {
     width: 100vw;
     height: 100vh;
     display: flex;
     flex-direction: column;
-    font-family: 'Syne', sans-serif;
+    font-family: var(--font-ui);
     transition: background 0.4s;
     position: relative;
     overflow: hidden;
@@ -101,19 +98,8 @@
     position: relative;
     z-index: 5;
   }
-  #app.light .topbar-clock { color: rgba(50,30,110,0.65); }
   #app.light .topbar-title { color: #1e0d5c; }
   #app.light .topbar-title span { color: #7c3aed; }
-  #app.light .mode-btn, #app.light .fullscreen-btn {
-    color: rgba(50,30,110,0.7);
-    background: rgba(255,255,255,0.4);
-    border-color: rgba(255,255,255,0.75);
-    backdrop-filter: blur(10px);
-  }
-  #app.light .mode-btn:hover, #app.light .fullscreen-btn:hover {
-    background: rgba(255,255,255,0.65);
-    color: #1e0d5c;
-  }
   #app.light .scan-panel {
     background: rgba(255,255,255,0.22);
     backdrop-filter: blur(20px);
@@ -165,18 +151,24 @@
     backdrop-filter: blur(1px);
     border-color: rgba(255,255,255,0.5);
   }
-  #app.light thead th { color: rgba(25,13,92,0.6); }
-  #app.light thead tr {
-    backdrop-filter: blur(30px);
-    background: rgba(255,255,255,0.7);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+  #app.light .table-header {
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.5);
+  }
+  #app.light .table-header th {
+    color: rgba(25,13,92,0.8);
+    background: transparent;
+  }
+  #app.light .table-body {
+    background: rgba(255,255,255,0.1);
   }
   #app.light tbody tr:hover { background: rgba(255,255,255,0.18); }
-  #app.light td { color: #1e0d5c; }
-  #app.light td.no-col { color: rgba(30,13,92,0.32); width: 5px; }
-  #app.light td.waktu-col { color: rgba(30,13,92,0.48); width: 60px; }
-  #app.light td.kupon-col { color: #1e0d5c; font-weight: 600; }
-  #app.light td.hadiah-col { color: rgba(30,13,92,0.72); }
+  #app.light tbody td {
+    color: #1e0d5c;
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
   #app.light .empty-row td { color: rgba(30,13,92,0.28); }
   #app.light .divider-row td {
     background: rgba(124,58,237,0.07);
@@ -194,18 +186,22 @@
     border-color: rgba(200,30,30,0.25);
     color: #b91c1c;
   }
-  #app.light .badge-menang {
-    color: #78350f;
-    background: rgba(234,179,8,0.14);
-    border-color: rgba(234,179,8,0.38);
+  #app.light .bottom-bar {
+    background: rgba(0,0,0,0.03);
+    border-top-color: rgba(0,0,0,0.1);
+    color: #1e0d5c;
   }
-  #app.light .badge-belum {
-    color: #991b1b;
-    background: rgba(220,40,40,0.07);
-    border-color: rgba(220,40,40,0.25);
+  #app.light .bottom-clock { color: rgba(50,30,110,0.65); }
+  #app.light .mode-btn, #app.light .fullscreen-btn {
+    color: rgba(50,30,110,0.7);
+    background: rgba(255,255,255,0.4);
+    border-color: rgba(255,255,255,0.75);
+    backdrop-filter: blur(10px);
   }
-  #app.light .tbl-scroll::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.2); }
-  #app.light .tbl-scroll::-webkit-scrollbar-thumb:hover { background: rgba(124,58,237,0.4); }
+  #app.light .mode-btn:hover, #app.light .fullscreen-btn:hover {
+    background: rgba(255,255,255,0.65);
+    color: #1e0d5c;
+  }
 
   /* Dark theme */
   #app.dark {
@@ -215,7 +211,6 @@
     background: rgba(0,0,0,0.4);
     border-bottom: 1px solid rgba(255,255,255,0.08);
   }
-  #app.dark .topbar-clock { color: rgba(255,255,255,0.45); }
   #app.dark .topbar-title { color: #fff; }
   #app.dark .topbar-title span { color: #a78bfa; }
   #app.dark .mode-btn, #app.dark .fullscreen-btn {
@@ -271,19 +266,25 @@
     background: rgba(0,0,0,0.25);
     border-color: rgba(255,255,255,0.1);
   }
-  #app.dark thead tr {
-    backdrop-filter: blur(10px);
-    background: rgba(255,255,255,0.06);
+  #app.dark .table-header {
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255,255,255,0.1);
   }
-  #app.dark thead th { color: rgba(255,255,255,0.4); }
+  #app.dark .table-header th {
+    color: rgba(255,255,255,0.7);
+    background: transparent;
+  }
+  #app.dark .table-body {
+    background: rgba(0,0,0,0.2);
+  }
   #app.dark tbody tr { border-bottom: 1px solid rgba(255,255,255,0.05); }
   #app.dark tbody tr:hover { background: rgba(255,255,255,0.04); }
-  #app.dark td { color: rgba(255,255,255,0.75); }
-  #app.dark td.no-col { color: rgba(255,255,255,0.25); width: 5px; }
-  #app.dark td.waktu-col { color: rgba(255,255,255,0.35); width: 60px; }
-  #app.dark td.kupon-col { color: #fff; }
-  #app.dark td.hadiah-col { color: rgba(255,255,255,0.65); }
+  #app.dark tbody td {
+    color: rgba(255,255,255,0.75);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
   #app.dark .empty-row td { color: rgba(255,255,255,0.18); }
   #app.dark .divider-row td {
     background: rgba(167,139,250,0.08);
@@ -301,55 +302,83 @@
     border-color: rgba(220,40,40,0.4);
     color: #ff6b5b;
   }
-  #app.dark .badge-menang {
-    color: #fbbf24;
-    background: rgba(234,179,8,0.2);
-    border-color: rgba(234,179,8,0.5);
+  #app.dark .bottom-bar {
+    background: rgba(255,255,255,0.03);
+    border-top-color: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.7);
   }
-  #app.dark .badge-belum {
-    color: #f87171;
-    background: rgba(220,40,40,0.15);
-    border-color: rgba(220,40,40,0.4);
-  }
-  #app.dark .tbl-scroll::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.3); }
-  #app.dark .tbl-scroll::-webkit-scrollbar-thumb:hover { background: rgba(167,139,250,0.55); }
+  #app.dark .bottom-clock { color: rgba(255,255,255,0.45); }
 
-  /* Shared */
+  /* ===== SCROLLBAR KUSTOM + AUTO HIDE ===== */
+  .table-body {
+    scrollbar-width: thin; /* Firefox */
+    transition: scrollbar-color 0.2s;
+  }
+  /* Webkit */
+  .table-body::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    background: transparent;
+  }
+  .table-body::-webkit-scrollbar-track {
+    background: transparent;
+    margin-block: 2px;
+  }
+  .table-body::-webkit-scrollbar-thumb {
+    background: rgba(124,58,237,0.3);
+    border-radius: 10px;
+    transition: background 0.3s ease;
+  }
+  #app.light .table-body::-webkit-scrollbar-thumb {
+    background: rgba(124,58,237,0.25);
+  }
+  #app.dark .table-body::-webkit-scrollbar-thumb {
+    background: rgba(167,139,250,0.35);
+  }
+  /* Saat hover pada area scrollbar atau saat discroll (aktif) */
+  .table-body:hover::-webkit-scrollbar-thumb,
+  .table-body.scrolling::-webkit-scrollbar-thumb {
+    background: rgba(124,58,237,0.7);
+  }
+  #app.light .table-body:hover::-webkit-scrollbar-thumb,
+  #app.light .table-body.scrolling::-webkit-scrollbar-thumb {
+    background: rgba(124,58,237,0.8);
+  }
+  #app.dark .table-body:hover::-webkit-scrollbar-thumb,
+  #app.dark .table-body.scrolling::-webkit-scrollbar-thumb {
+    background: rgba(167,139,250,0.9);
+  }
+  /* Firefox */
+  .table-body {
+    scrollbar-color: rgba(124,58,237,0.3) transparent;
+  }
+  .table-body:hover {
+    scrollbar-color: rgba(124,58,237,0.7) transparent;
+  }
+  #app.dark .table-body {
+    scrollbar-color: rgba(167,139,250,0.35) transparent;
+  }
+  #app.dark .table-body:hover {
+    scrollbar-color: rgba(167,139,250,0.9) transparent;
+  }
+
+  /* ===== TOPBAR ===== */
   .topbar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 10px 20px;
     flex-shrink: 0;
   }
-  .topbar-clock {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 1px;
-  }
   .topbar-title {
     font-size: 14px;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 3px;
     text-transform: uppercase;
+    font-family: var(--font-ui);
   }
-  .topbar-buttons {
-    display: flex;
-    gap: 8px;
-  }
-  .mode-btn, .fullscreen-btn {
-    font-family: 'DM Mono', monospace;
-    font-size: 16px;
-    padding: 5px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-  }
+
+  /* ===== SCAN PANEL ===== */
   .scan-panel {
     padding: 14px 20px;
     flex-shrink: 0;
@@ -364,7 +393,7 @@
     border-radius: 10px;
     padding: 13px 18px;
     font-size: 16px;
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-weight: 500;
     letter-spacing: 3px;
     outline: none;
@@ -376,6 +405,7 @@
     letter-spacing: 1px;
     font-size: 12px;
     text-transform: none;
+    font-family: var(--font-ui);
   }
   .cek-btn {
     padding: 0 28px;
@@ -384,7 +414,7 @@
     border: none;
     border-radius: 10px;
     color: #fff;
-    font-family: 'Syne', sans-serif;
+    font-family: var(--font-ui);
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
@@ -397,9 +427,7 @@
     transform: translateY(-1px);
     box-shadow: 0 6px 18px rgba(124,58,237,0.45);
   }
-  .cek-btn:active {
-    transform: scale(0.97);
-  }
+  .cek-btn:active { transform: scale(0.97); }
   .queue-badge {
     display: flex;
     align-items: center;
@@ -408,7 +436,7 @@
     height: 50px;
     border-radius: 10px;
     border: 1px solid;
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 1px;
@@ -420,7 +448,7 @@
     margin-top: 10px;
     padding: 12px 18px;
     border-radius: 10px;
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 1px;
@@ -431,15 +459,13 @@
     border: 1px solid;
   }
   .result-banner.win,
-  .result-banner.lose {
-    display: block;
-  }
+  .result-banner.lose { display: block; }
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* FIX: table-section mengambil sisa ruang dengan min-height: 0 agar tidak overflow */
+  /* ===== TABLE SECTION (header & body terpisah) ===== */
   .table-section {
     flex: 1 1 0;
     min-height: 0;
@@ -470,12 +496,12 @@
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
   }
   .hapus-btn {
     padding: 6px 14px;
     border-radius: 7px;
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -487,7 +513,7 @@
   .upload-btn {
     padding: 6px 14px;
     border-radius: 7px;
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -502,7 +528,7 @@
     background: linear-gradient(135deg, #065f46, #047857);
     border: 1px solid rgba(0,200,120,0.3);
     color: #fff;
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -512,40 +538,40 @@
   }
   .export-btn:hover { opacity: 0.85; }
 
-  /* FIX: table-wrap mengisi sisa dan tidak overflow keluar */
   .table-wrap {
     flex: 1 1 0;
     min-height: 0;
-    border-radius: 4px;
-    overflow: hidden;
+    border-radius: 12px;
     border: 1px solid;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
   }
-  .tbl-scroll {
-    flex: 1 1 0;
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
+  .table-header {
+    flex-shrink: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
   }
-  .tbl-scroll::-webkit-scrollbar { width: 6px; }
-  .tbl-scroll::-webkit-scrollbar-track { background: transparent; }
-  .tbl-scroll::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    transition: background 0.2s;
+  .table-body {
+    flex: 1;
+    overflow: auto;
+    transition: scrollbar-color 0.2s;
   }
-  table {
+  .table-header table, .table-body table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed;
   }
-  thead tr {
-    position: sticky;
-    top: 0;
-    z-index: 3;
-  }
-  thead th {
-    padding: 11px 14px;
-    font-family: 'DM Mono', monospace;
+  /* Lebar kolom seragam */
+  .table-header th:first-child, .table-body td:first-child { width: 55px; }
+  .table-header th:nth-child(2), .table-body td:nth-child(2) { width: 115px; }
+  .table-header th:nth-child(3), .table-body td:nth-child(3) { width: 105px; }
+  .table-header th:last-child, .table-body td:last-child { width: auto; }
+
+  .table-header th {
+    padding: 11px 8px;
+    font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 500;
     letter-spacing: 1.5px;
@@ -553,33 +579,20 @@
     text-align: left;
     white-space: nowrap;
   }
-  thead th:last-child { text-align: center; }
-  tbody tr {
-    transition: background 0.15s;
-    animation: fadeIn 0.25s ease;
-  }
-  tbody td {
-    padding: 11px 14px;
-    font-family: 'DM Mono', monospace;
+  .table-body td {
+    padding: 10px 8px;
+    font-family: var(--font-mono);
     font-size: 12px;
+    white-space: nowrap;
   }
-  td.no-col { width: 40px; }
-  td.waktu-col { white-space: nowrap; font-size: 11px; }
-  td.kupon-col { letter-spacing: 2px; }
-  .badge-menang,
-  .badge-belum {
-    display: inline-block;
-    padding: 4px 14px;
-    border-radius: 6px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    border: 1px solid;
+  .table-body td:last-child {
+    white-space: normal;
+    word-break: break-word;
   }
+
   .divider-row td {
-    padding: 7px 14px;
-    font-family: 'DM Mono', monospace;
+    padding: 7px 8px;
+    font-family: var(--font-mono);
     font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -590,7 +603,10 @@
     padding: 40px;
     font-size: 12px;
     letter-spacing: 1px;
+    font-family: var(--font-mono);
   }
+
+  /* Win glow */
   .result-banner.win {
     animation: glowPulse 1.2s ease-in-out infinite, fadeIn 0.4s ease;
     box-shadow: 0 0 15px 2px rgba(0,200,120,0.6), 0 0 30px 5px rgba(0,255,150,0.3);
@@ -615,37 +631,52 @@
     100% { box-shadow: 0 0 6px 2px rgba(0,160,80,0.5); text-shadow: 0 0 1px #065f46; }
   }
 
-  /* Zoom control */
-  .zoom-control {
+  /* ===== BOTTOM BAR ===== */
+  .bottom-bar {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
     gap: 12px;
-    padding: 8px 20px;
+    padding: 7px 20px;
     border-top: 1px solid rgba(255,255,255,0.2);
     flex-shrink: 0;
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 12px;
   }
-  #app.light .zoom-control {
-    background: rgba(0,0,0,0.03);
-    border-top-color: rgba(0,0,0,0.1);
-    color: #1e0d5c;
+  .bottom-clock {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
-  #app.dark .zoom-control {
-    background: rgba(255,255,255,0.03);
-    border-top-color: rgba(255,255,255,0.1);
-    color: rgba(255,255,255,0.7);
+  .bottom-spacer { flex: 1; }
+  .mode-btn, .fullscreen-btn {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    padding: 4px 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    flex-shrink: 0;
   }
-  .zoom-label { letter-spacing: 1px; }
   .zoom-slider {
-    width: 160px;
+    width: 140px;
     cursor: pointer;
     accent-color: #7c3aed;
+    flex-shrink: 0;
   }
-  .zoom-value { min-width: 45px; text-align: right; }
+  .zoom-value {
+    min-width: 40px;
+    text-align: right;
+    flex-shrink: 0;
+  }
 
-  /* Overlay fullscreen */
+  /* ===== OVERLAY ===== */
   #fullscreen-overlay {
     position: fixed;
     top: 0; left: 0;
@@ -655,7 +686,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Syne', sans-serif;
+    font-family: var(--font-ui);
     transition: opacity 0.5s ease, visibility 0.5s ease;
   }
   #fullscreen-overlay.hide {
@@ -678,12 +709,12 @@
     from { opacity: 0; transform: translateY(30px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-  .overlay-card h2 { color: #1e0d5c; font-size: 28px; margin-bottom: 8px; letter-spacing: 2px; }
+  .overlay-card h2 { color: #1e0d5c; font-size: 26px; margin-bottom: 8px; letter-spacing: 2px; font-family: var(--font-ui); font-weight: 700; }
   .overlay-card h2 span { color: #7c3aed; }
   .overlay-sub {
     color: #2d1b69;
     margin-bottom: 28px;
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 13px;
     font-weight: 500;
     opacity: 0.7;
@@ -707,14 +738,14 @@
   }
   .overlay-upload-icon { font-size: 32px; margin-bottom: 10px; display: block; }
   .overlay-upload-label {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 12px;
     color: rgba(30,13,92,0.6);
     letter-spacing: 1px;
     display: block;
   }
   .overlay-kupon-info {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 24px;
     font-weight: 500;
     color: #065f46;
@@ -723,7 +754,7 @@
     margin-bottom: 4px;
   }
   .overlay-kupon-sub {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 11px;
     color: rgba(6,95,70,0.7);
     letter-spacing: 1px;
@@ -731,7 +762,7 @@
     margin-bottom: 8px;
   }
   .overlay-reupload-hint {
-    font-family: 'DM Mono', monospace;
+    font-family: var(--font-mono);
     font-size: 10px;
     color: rgba(30,13,92,0.4);
     letter-spacing: 1px;
@@ -749,7 +780,7 @@
     font-size: 16px;
     font-weight: bold;
     color: white;
-    font-family: 'Syne', sans-serif;
+    font-family: var(--font-ui);
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
     letter-spacing: 1px;
@@ -770,24 +801,18 @@
   <div class="overlay-card">
     <h2>🎫 <span>Checker</span> Kupon</h2>
     <p class="overlay-sub">Upload master kupon untuk memulai</p>
-
     <input type="file" id="overlayFileInput" accept=".xlsx,.xls,.csv">
-
-    <!-- State: belum upload -->
     <div class="overlay-upload-zone" id="overlayUploadZone">
       <span class="overlay-upload-icon">📂</span>
       <span class="overlay-upload-label">Klik untuk upload file Excel</span>
       <span class="overlay-upload-label" style="margin-top:4px;font-size:10px;opacity:0.6">(.xlsx / .xls / .csv)</span>
     </div>
-
-    <!-- State: sudah upload (tersembunyi sampai ada data) -->
     <div class="overlay-upload-zone has-file" id="overlayFileInfo" style="display:none;">
       <span class="overlay-upload-icon">✅</span>
       <span class="overlay-kupon-info" id="overlayKuponCount">0 Kupon</span>
       <span class="overlay-kupon-sub" id="overlayFileName">—</span>
       <span class="overlay-reupload-hint" id="overlayReuploadBtn">↺ Ganti file</span>
     </div>
-
     <button id="confirmFullscreenBtn" disabled>Check Kupon</button>
   </div>
 </div>
@@ -798,12 +823,7 @@
   <div class="bg-orb2"></div>
 
   <div class="topbar">
-    <div class="topbar-clock" id="clock">--/--/---- --:--:--</div>
     <div class="topbar-title">Checker <span>Kupon</span> Undian</div>
-    <div class="topbar-buttons">
-      <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶</button>
-      <button class="mode-btn" onclick="toggleTheme()">🌓</button>
-    </div>
   </div>
 
   <div class="scan-panel">
@@ -828,16 +848,15 @@
       </div>
     </div>
     <div class="table-wrap">
-      <div class="tbl-scroll">
+      <div class="table-header">
         <table>
           <thead>
-            <tr>
-              <th>No</th>
-              <th>Waktu</th>
-              <th>Kupon</th>
-              <th>Hadiah</th>
-            </tr>
+            <tr><th>No</th><th>Waktu</th><th>Kupon</th><th>Hadiah</th></tr>
           </thead>
+        </table>
+      </div>
+      <div class="table-body" id="tableBody">
+        <table>
           <tbody id="historyBody">
             <tr class="empty-row"><td colspan="4">— Belum ada riwayat pengecekan —</td></tr>
           </tbody>
@@ -846,9 +865,13 @@
     </div>
   </div>
 
-  <div class="zoom-control">
-    <span class="zoom-label">🔍 Zoom Tampilan</span>
-    <input type="range" id="zoomSlider" class="zoom-slider" min="1" max="2" step="0.1" value="1">
+  <div class="bottom-bar">
+    <span class="bottom-clock" id="clock">--/--/---- --:--:--</span>
+    <div class="bottom-spacer"></div>
+    <button class="mode-btn" onclick="toggleTheme()">🌓</button>
+    <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶</button>
+    <span class="mode-btn">🔍</span>
+    <input type="range" id="zoomSlider" class="zoom-slider" min="1" max="2" step="0.05" value="1">
     <span id="zoomValue" class="zoom-value">100%</span>
   </div>
 </div>
@@ -859,6 +882,22 @@
   let history = [];
   let currentQueue = 1;
   let currentQueueCount = 0;
+
+  // Auto-hide scrollbar logic
+  const tableBody = document.querySelector('.table-body');
+  let scrollTimeout;
+  function handleScrollStart() {
+    if (!tableBody) return;
+    tableBody.classList.add('scrolling');
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      tableBody.classList.remove('scrolling');
+    }, 1000);
+  }
+  if (tableBody) {
+    tableBody.addEventListener('scroll', handleScrollStart);
+    // juga saat mouse enter area scrollbar (tapi cukup dengan hover CSS)
+  }
 
   function saveStorage() {
     try {
@@ -947,11 +986,7 @@
   document.getElementById('couponInput').addEventListener('keydown', e => {
     if (e.key !== 'Enter') return;
     const val = document.getElementById('couponInput').value.trim();
-    if (val === '') {
-      newQueue();
-    } else {
-      checkCoupon();
-    }
+    if (val === '') { newQueue(); } else { checkCoupon(); }
   });
 
   function newQueue() {
@@ -1078,24 +1113,19 @@
   function toggleFullscreen() {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(err => {
-        console.log(`Error attempting fullscreen: ${err.message}`);
+        console.log(`Error: ${err.message}`);
       });
     } else {
       document.exitFullscreen();
     }
   }
 
-  // Zoom slider — pakai transform:scale pada #app, BUKAN body.style.zoom
-  // Agar #app tetap 100vw x 100vh secara layout, kita perbesar visually saja via scale
-  // tapi karena scale mengecilkan/membesarkan dari pojok kiri atas, kita perlu
-  // menyesuaikan width/height #app agar konten tetap fill saat zoom out
+  // Zoom
   const appEl = document.getElementById('app');
   const zoomSlider = document.getElementById('zoomSlider');
   const zoomValueSpan = document.getElementById('zoomValue');
 
   function applyZoom(val) {
-    // Saat scale < 1, konten mengecil dan ada ruang kosong.
-    // Kompensasi: perbesar #app sesuai inverse scale agar tetap mengisi layar.
     const inverse = 1 / val;
     appEl.style.transform = `scale(${val})`;
     appEl.style.transformOrigin = 'top left';
@@ -1106,7 +1136,7 @@
   const savedZoom = localStorage.getItem('appZoom');
   if (savedZoom) {
     const zoom = parseFloat(savedZoom);
-    if (!isNaN(zoom) && zoom >= 0.8 && zoom <= 1.5) {
+    if (!isNaN(zoom) && zoom >= 1 && zoom <= 2) {
       zoomSlider.value = zoom;
       zoomValueSpan.textContent = Math.round(zoom * 100) + '%';
       applyZoom(zoom);
@@ -1121,22 +1151,20 @@
 
   document.documentElement.classList.add('light-bg');
 
-  // ========== OVERLAY: UPLOAD FILE DULU, BARU MASUK FULLSCREEN ==========
+  // Overlay
   (function initOverlay() {
-    const overlay       = document.getElementById('fullscreen-overlay');
-    const confirmBtn    = document.getElementById('confirmFullscreenBtn');
-    const overlayInput  = document.getElementById('overlayFileInput');
-    const uploadZone    = document.getElementById('overlayUploadZone');
-    const fileInfo      = document.getElementById('overlayFileInfo');
-    const kuponCount    = document.getElementById('overlayKuponCount');
-    const fileNameEl    = document.getElementById('overlayFileName');
-    const reuploadBtn   = document.getElementById('overlayReuploadBtn');
+    const overlay      = document.getElementById('fullscreen-overlay');
+    const confirmBtn   = document.getElementById('confirmFullscreenBtn');
+    const overlayInput = document.getElementById('overlayFileInput');
+    const uploadZone   = document.getElementById('overlayUploadZone');
+    const fileInfo     = document.getElementById('overlayFileInfo');
+    const kuponCount   = document.getElementById('overlayKuponCount');
+    const fileNameEl   = document.getElementById('overlayFileName');
+    const reuploadBtn  = document.getElementById('overlayReuploadBtn');
 
-    // Cek apakah sudah ada data kupon di localStorage
     function refreshOverlayState() {
       const count = Object.keys(couponDB).length;
       if (count > 0) {
-        // Sudah ada data — tampilkan info, aktifkan tombol
         uploadZone.style.display = 'none';
         fileInfo.style.display   = 'block';
         kuponCount.textContent   = count.toLocaleString('id-ID') + ' Kupon';
@@ -1144,7 +1172,6 @@
         fileNameEl.textContent   = savedName;
         confirmBtn.disabled      = false;
       } else {
-        // Belum ada data
         uploadZone.style.display = 'block';
         fileInfo.style.display   = 'none';
         confirmBtn.disabled      = true;
@@ -1153,12 +1180,9 @@
 
     refreshOverlayState();
 
-    // Klik zona upload → buka file picker
     uploadZone.addEventListener('click', () => overlayInput.click());
-    // Tombol ganti file
     reuploadBtn.addEventListener('click', () => overlayInput.click());
 
-    // Proses file yang dipilih di overlay
     overlayInput.addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -1180,7 +1204,6 @@
           }
           localStorage.setItem('kupon_filename', file.name);
           saveStorage();
-          // Sinkronisasi tombol upload di toolbar utama
           syncMainUploadBtn();
           refreshOverlayState();
         } catch(err) {
@@ -1191,7 +1214,6 @@
       this.value = '';
     });
 
-    // Tombol masuk fullscreen
     confirmBtn.addEventListener('click', () => {
       document.documentElement.requestFullscreen().catch(err => {
         console.warn('Gagal masuk fullscreen:', err);

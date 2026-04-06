@@ -8,223 +8,791 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0;}
-  html,body{height:100%;width:100%;overflow:hidden;}
-
-  #app{
-    height:100vh;width:100%;
-    display:flex;flex-direction:column;
-    font-family:'Syne',sans-serif;
-    transition:background 0.4s;
-    position:relative;
-  }
-  #app.light{background:linear-gradient(135deg,#c9b8f0 0%,#b8d0f5 40%,#a8e6d0 100%);}
-  #app.light .bg-orb1{
-    content:'';position:absolute;width:500px;height:500px;border-radius:50%;
-    background:radial-gradient(circle,rgba(255,255,255,0.5) 0%,transparent 65%);
-    top:-150px;left:-100px;pointer-events:none;z-index:0;
-  }
-  #app.light .bg-orb2{
-    position:absolute;width:400px;height:400px;border-radius:50%;
-    background:radial-gradient(circle,rgba(168,216,255,0.45) 0%,transparent 65%);
-    bottom:-100px;right:-80px;pointer-events:none;z-index:0;
-  }
-  #app.light .topbar{
-    background:rgba(255,255,255,0.3);
-    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-    border-bottom:1px solid rgba(255,255,255,0.5);
-    position:relative;z-index:5;
-  }
-  #app.light .topbar-clock{color:rgba(50,30,110,0.65);}
-  #app.light .topbar-title{color:#1e0d5c;}
-  #app.light .topbar-title span{color:#7c3aed;}
-  #app.light .mode-btn, #app.light .fullscreen-btn, #app.light .install-btn{
-    color:rgba(50,30,110,0.7);
-    background:rgba(255,255,255,0.4);
-    border-color:rgba(255,255,255,0.75);
-    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  }
-  #app.light .mode-btn:hover, #app.light .fullscreen-btn:hover, #app.light .install-btn:hover{background:rgba(255,255,255,0.65);color:#1e0d5c;}
-  #app.light .scan-panel{
-    background:rgba(255,255,255,0.22);
-    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-    border-bottom:1px solid rgba(255,255,255,0.45);
-    position:relative;z-index:4;
-  }
-  #app.light .scan-input{
-    background:rgba(255,255,255,0.45);
-    border-color:rgba(255,255,255,0.8);
-    color:#1e0d5c;
-    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  }
-  #app.light .scan-input::placeholder{color:rgba(50,30,110,0.38);}
-  #app.light .scan-input:focus{border-color:rgba(124,58,237,0.55);background:rgba(255,255,255,0.7);box-shadow:0 0 0 3px rgba(124,58,237,0.12);}
-  #app.light .queue-badge{display: none}
-  #app.light .tbl-label{color:rgba(30,13,92,0.65);}
-  #app.light .hapus-btn{background:rgba(220,40,40,0.07);border-color:rgba(220,40,40,0.22);color:#b91c1c;}
-  #app.light .hapus-btn:hover{background:rgba(220,40,40,0.14);color:#7f1d1d;}
-  #app.light .upload-btn{
-    background:rgba(255,255,255,0.4);border-color:rgba(255,255,255,0.75);
-    color:rgba(30,13,92,0.7);
-    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  }
-  #app.light .upload-btn:hover{background:rgba(255,255,255,0.6);color:#1e0d5c;}
-  #app.light .upload-btn.loaded{border-color:rgba(0,150,100,0.4);color:#065f46;background:rgba(0,180,120,0.1);}
-  #app.light .table-section{position:relative;z-index:3;}
-  #app.light .table-wrap{
-    background:rgba(255,255,255,0.18);
-    backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(24px);
-    border-color:rgba(255,255,255,0.5);
-  }
-  #app.light thead th{color:rgba(25,13,92,0.6);}
-  #app.light thead tr {backdrop-filter: blur(30px);background:rgba(255,255,255,0.7);border-bottom:1px solid rgba(255,255,255,0.1);}
-  #app.light tbody tr:hover{background:rgba(255,255,255,0.18);}
-  #app.light td{color:#1e0d5c;}
-  #app.light td.no-col{color:rgba(30,13,92,0.32);width :5px;}
-  #app.light td.waktu-col{color:rgba(30,13,92,0.48);width :60px;}
-  #app.light td.kupon-col{color:#1e0d5c;font-weight:600;width :0px}
-  #app.light td.hadiah-col{color:rgba(30,13,92,0.72);}
-  #app.light .empty-row td{color:rgba(30,13,92,0.28);}
-  #app.light .divider-row td{background:rgba(124,58,237,0.07);color:#4c1d95;border-top:1px solid rgba(124,58,237,0.18);border-bottom:1px solid rgba(124,58,237,0.18);}
-  #app.light .result-banner.win{background:rgba(0,160,100,0.1);border-color:rgba(0,160,100,0.35);color:#065f46;}
-  #app.light .result-banner.lose{background:rgba(200,30,30,0.07);border-color:rgba(200,30,30,0.25);color:#b91c1c;}
-  #app.light .badge-menang{color:#78350f;background:rgba(234,179,8,0.14);border-color:rgba(234,179,8,0.38);}
-  #app.light .badge-belum{color:#991b1b;background:rgba(220,40,40,0.07);border-color:rgba(220,40,40,0.25);}
-  #app.light .tbl-scroll::-webkit-scrollbar-thumb{background:rgba(124,58,237,0.2);}
-  #app.light .tbl-scroll::-webkit-scrollbar-thumb:hover{background:rgba(124,58,237,0.4);}
-
-  #app.dark{background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);}
-  #app.dark .topbar{background:rgba(0,0,0,0.4);border-bottom:1px solid rgba(255,255,255,0.08);}
-  #app.dark .topbar-clock{color:rgba(255,255,255,0.45);}
-  #app.dark .topbar-title{color:#fff;}
-  #app.dark .topbar-title span{color:#a78bfa;}
-  #app.dark .mode-btn, #app.dark .fullscreen-btn, #app.dark .install-btn{color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.12);}
-  #app.dark .mode-btn:hover, #app.dark .fullscreen-btn:hover, #app.dark .install-btn:hover{color:#fff;background:rgba(255,255,255,0.13);}
-  #app.dark .scan-panel{background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.08);}
-  #app.dark .scan-input{background:rgba(0,0,0,0.4);border-color:rgba(255,255,255,0.15);color:#fff;}
-  #app.dark .scan-input::placeholder{color:rgba(255,255,255,0.2);}
-  #app.dark .scan-input:focus{border-color:rgba(120,80,255,0.6);background:rgba(120,80,255,0.07);box-shadow:0 0 0 3px rgba(120,80,255,0.12);}
-  #app.dark .queue-badge{display: none}
-  #app.dark .tbl-label{color:rgba(255,255,255,0.5);}
-  #app.dark .hapus-btn{background:rgba(220,40,40,0.2);border-color:rgba(220,40,40,0.4);color:#f87171;}
-  #app.dark .hapus-btn:hover{background:rgba(220,40,40,0.35);color:#fff;}
-  #app.dark .upload-btn{background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);}
-  #app.dark .upload-btn:hover{background:rgba(255,255,255,0.12);color:#fff;}
-  #app.dark .upload-btn.loaded{border-color:rgba(0,200,120,0.4);color:#00d48a;background:rgba(0,200,120,0.08);}
-  #app.dark .table-wrap{background:rgba(0,0,0,0.25);border-color:rgba(255,255,255,0.1);}
-  #app.dark thead tr{backdrop-filter: blur(10px);background:rgba(255,255,255,0.06);border-bottom:1px solid rgba(255,255,255,0.1);}
-  #app.dark thead th{color:rgba(255,255,255,0.4);}
-  #app.dark tbody tr{border-bottom:1px solid rgba(255,255,255,0.05);}
-  #app.dark tbody tr:hover{background:rgba(255,255,255,0.04);}
-  #app.dark td{color:rgba(255,255,255,0.75);}
-  #app.dark td.no-col{color:rgba(255,255,255,0.25);width :5px;}
-  #app.dark td.waktu-col{color:rgba(255,255,255,0.35);width :60px;}
-  #app.dark td.kupon-col{color:#fff;width :0px}
-  #app.dark td.hadiah-col{color:rgba(255,255,255,0.65);}
-  #app.dark .empty-row td{color:rgba(255,255,255,0.18);}
-  #app.dark .divider-row td{background:rgba(167,139,250,0.08);color:#c4b5fd;border-top:1px solid rgba(167,139,250,0.2);border-bottom:1px solid rgba(167,139,250,0.2);}
-  #app.dark .result-banner.win{background:rgba(0,200,120,0.12);border-color:rgba(0,200,120,0.45);color:#00d48a;}
-  #app.dark .result-banner.lose{background:rgba(220,40,40,0.1);border-color:rgba(220,40,40,0.4);color:#ff6b5b;}
-  #app.dark .badge-menang{color:#fbbf24;background:rgba(234,179,8,0.2);border-color:rgba(234,179,8,0.5);}
-  #app.dark .badge-belum{color:#f87171;background:rgba(220,40,40,0.15);border-color:rgba(220,40,40,0.4);}
-  #app.dark .tbl-scroll::-webkit-scrollbar-thumb{background:rgba(167,139,250,0.3);}
-  #app.dark .tbl-scroll::-webkit-scrollbar-thumb:hover{background:rgba(167,139,250,0.55);}
-
-  /* ── SHARED ── */
-  .topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;flex-shrink:0;}
-  .topbar-clock{font-family:'DM Mono',monospace;font-size:12px;letter-spacing:1px;}
-  .topbar-title{font-size:14px;font-weight:800;letter-spacing:3px;text-transform:uppercase;}
-  .topbar-buttons{display:flex;gap:8px;}
-  .mode-btn, .fullscreen-btn, .install-btn{
-    font-family:'DM Mono',monospace;
-    font-size:16px;
-    padding:5px 12px;
-    border-radius:6px;
-    cursor:pointer;
-    transition:all 0.2s;
-    border:1px solid;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    line-height:1;
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
 
-  .scan-panel{padding:14px 20px;flex-shrink:0;}
-  .scan-row{display:flex;gap:10px;align-items:center;}
-  .scan-input{flex:1;border-radius:10px;padding:13px 18px;font-size:16px;font-family:'DM Mono',monospace;font-weight:500;letter-spacing:3px;outline:none;transition:all 0.25s;text-transform:uppercase;border:1px solid;}
-  .scan-input::placeholder{letter-spacing:1px;font-size:12px;text-transform:none;}
-  .cek-btn{padding:0 28px;height:50px;background:linear-gradient(135deg,#7c3aed,#4f46e5);border:none;border-radius:10px;color:#fff;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:1px;text-transform:uppercase;white-space:nowrap;}
-  .cek-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(124,58,237,0.45);}
-  .cek-btn:active{transform:scale(0.97);}
-  .queue-badge{display:flex;align-items:center;gap:6px;padding:0 16px;height:50px;border-radius:10px;border:1px solid;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;letter-spacing:1px;white-space:nowrap;flex-shrink:0;transition:all 0.25s;}
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+  }
 
-  .result-banner{margin-top:10px;padding:12px 18px;border-radius:10px;font-family:'DM Mono',monospace;font-size:14px;font-weight:500;letter-spacing:1px;text-align:center;text-transform:uppercase;display:none;animation:fadeIn 0.3s ease;border:1px solid;}
-  .result-banner.win,.result-banner.lose{display:block;}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+  html {
+    transition: background 0.4s;
+  }
+  html.light-bg {
+    background: linear-gradient(135deg, #c9b8f0 0%, #b8d0f5 40%, #a8e6d0 100%);
+  }
+  html.dark-bg {
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  }
 
-  .table-section{flex:1;padding:14px 20px 16px;display:flex;flex-direction:column;min-height:0;}
-  .table-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-shrink:0;}
-  .toolbar-left{display:flex;align-items:center;gap:10px;}
-  .toolbar-right{margin-left:auto;display:flex;gap:8px;}
-  .tbl-label{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-family:'DM Mono',monospace;}
-  .hapus-btn{padding:6px 14px;border-radius:7px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;border:1px solid;}
-  input[type=file]{display:none;}
-  .upload-btn{padding:6px 14px;border-radius:7px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;white-space:nowrap;border:1px solid;}
-  .export-btn{padding:6px 16px;border-radius:7px;background:linear-gradient(135deg,#065f46,#047857);border:1px solid rgba(0,200,120,0.3);color:#fff;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
-  .export-btn:hover{opacity:0.85;}
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+  }
 
-  .table-wrap{flex:1;border-radius:4px;overflow:hidden;border:1px solid;display:flex;flex-direction:column;min-height:0;}
-  .tbl-scroll{flex:1;overflow-y:auto;}
-  .tbl-scroll::-webkit-scrollbar{width:6px;}
-  .tbl-scroll::-webkit-scrollbar-track{background:transparent;}
-  .tbl-scroll::-webkit-scrollbar-thumb{border-radius:10px;transition:background 0.2s;}
-  table{width:100%;border-collapse:collapse;}
-  thead tr{position:sticky;top:0;z-index:3;}
-  thead th{padding:11px 14px;font-family:'DM Mono',monospace;font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;text-align:left;white-space:nowrap;}
-  thead th:last-child{text-align:center;}
-  tbody tr{transition:background 0.15s;animation:fadeIn 0.25s ease;}
-  tbody td{padding:11px 14px;font-family:'DM Mono',monospace;font-size:12px;}
-  td.no-col{width:40px;}
-  td.waktu-col{white-space:nowrap;font-size:11px;}
-  td.kupon-col{letter-spacing:2px;}
-  td.hadiah-col{color:rgba(30,13,92,0.72);}
-  .badge-menang{display:inline-block;padding:4px 14px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border:1px solid;}
-  .badge-belum{display:inline-block;padding:4px 14px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border:1px solid;}
-  .divider-row td{padding:7px 14px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;text-align:center;}
-  .empty-row td{text-align:center;padding:40px;font-size:12px;letter-spacing:1px;}
+  /*
+    FIX ZOOM:
+    #app diberi transform-origin top left.
+    Zoom dilakukan via CSS transform: scale() pada #app,
+    bukan body.style.zoom yang menyebabkan body membesar dan memunculkan scrollbar browser.
+    .app-scale-wrapper memastikan overflow tetap terpotong.
+  */
+  .app-scale-wrapper {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
 
+  #app {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Syne', sans-serif;
+    transition: background 0.4s;
+    position: relative;
+    overflow: hidden;
+    transform-origin: top left;
+  }
+
+  /* Light theme */
+  #app.light {
+    background: linear-gradient(135deg, #c9b8f0 0%, #b8d0f5 40%, #a8e6d0 100%);
+  }
+  #app.light .bg-orb1 {
+    content: '';
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, transparent 65%);
+    top: -150px;
+    left: -100px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  #app.light .bg-orb2 {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(168,216,255,0.45) 0%, transparent 65%);
+    bottom: -100px;
+    right: -80px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  #app.light .topbar {
+    background: rgba(255,255,255,0.3);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.5);
+    position: relative;
+    z-index: 5;
+  }
+  #app.light .topbar-clock { color: rgba(50,30,110,0.65); }
+  #app.light .topbar-title { color: #1e0d5c; }
+  #app.light .topbar-title span { color: #7c3aed; }
+  #app.light .mode-btn, #app.light .fullscreen-btn {
+    color: rgba(50,30,110,0.7);
+    background: rgba(255,255,255,0.4);
+    border-color: rgba(255,255,255,0.75);
+    backdrop-filter: blur(10px);
+  }
+  #app.light .mode-btn:hover, #app.light .fullscreen-btn:hover {
+    background: rgba(255,255,255,0.65);
+    color: #1e0d5c;
+  }
+  #app.light .scan-panel {
+    background: rgba(255,255,255,0.22);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.45);
+    position: relative;
+    z-index: 4;
+  }
+  #app.light .scan-input {
+    background: rgba(255,255,255,0.45);
+    border-color: rgba(255,255,255,0.8);
+    color: #1e0d5c;
+    backdrop-filter: blur(10px);
+  }
+  #app.light .scan-input::placeholder { color: rgba(50,30,110,0.38); }
+  #app.light .scan-input:focus {
+    border-color: rgba(124,58,237,0.55);
+    background: rgba(255,255,255,0.7);
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+  }
+  #app.light .queue-badge { display: none; }
+  #app.light .tbl-label { color: rgba(30,13,92,0.65); }
+  #app.light .hapus-btn {
+    background: rgba(220,40,40,0.07);
+    border-color: rgba(220,40,40,0.22);
+    color: #b91c1c;
+  }
+  #app.light .hapus-btn:hover {
+    background: rgba(220,40,40,0.14);
+    color: #7f1d1d;
+  }
+  #app.light .upload-btn {
+    background: rgba(255,255,255,0.4);
+    border-color: rgba(255,255,255,0.75);
+    color: rgba(30,13,92,0.7);
+    backdrop-filter: blur(8px);
+  }
+  #app.light .upload-btn:hover {
+    background: rgba(255,255,255,0.6);
+    color: #1e0d5c;
+  }
+  #app.light .upload-btn.loaded {
+    border-color: rgba(0,150,100,0.4);
+    color: #065f46;
+    background: rgba(0,180,120,0.1);
+  }
+  #app.light .table-section { position: relative; z-index: 3; }
+  #app.light .table-wrap {
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(1px);
+    border-color: rgba(255,255,255,0.5);
+  }
+  #app.light thead th { color: rgba(25,13,92,0.6); }
+  #app.light thead tr {
+    backdrop-filter: blur(30px);
+    background: rgba(255,255,255,0.7);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  #app.light tbody tr:hover { background: rgba(255,255,255,0.18); }
+  #app.light td { color: #1e0d5c; }
+  #app.light td.no-col { color: rgba(30,13,92,0.32); width: 5px; }
+  #app.light td.waktu-col { color: rgba(30,13,92,0.48); width: 60px; }
+  #app.light td.kupon-col { color: #1e0d5c; font-weight: 600; }
+  #app.light td.hadiah-col { color: rgba(30,13,92,0.72); }
+  #app.light .empty-row td { color: rgba(30,13,92,0.28); }
+  #app.light .divider-row td {
+    background: rgba(124,58,237,0.07);
+    color: #4c1d95;
+    border-top: 1px solid rgba(124,58,237,0.18);
+    border-bottom: 1px solid rgba(124,58,237,0.18);
+  }
+  #app.light .result-banner.win {
+    background: rgba(0,160,100,0.1);
+    border-color: rgba(0,160,100,0.35);
+    color: #065f46;
+  }
+  #app.light .result-banner.lose {
+    background: rgba(200,30,30,0.07);
+    border-color: rgba(200,30,30,0.25);
+    color: #b91c1c;
+  }
+  #app.light .badge-menang {
+    color: #78350f;
+    background: rgba(234,179,8,0.14);
+    border-color: rgba(234,179,8,0.38);
+  }
+  #app.light .badge-belum {
+    color: #991b1b;
+    background: rgba(220,40,40,0.07);
+    border-color: rgba(220,40,40,0.25);
+  }
+  #app.light .tbl-scroll::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.2); }
+  #app.light .tbl-scroll::-webkit-scrollbar-thumb:hover { background: rgba(124,58,237,0.4); }
+
+  /* Dark theme */
+  #app.dark {
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  }
+  #app.dark .topbar {
+    background: rgba(0,0,0,0.4);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  #app.dark .topbar-clock { color: rgba(255,255,255,0.45); }
+  #app.dark .topbar-title { color: #fff; }
+  #app.dark .topbar-title span { color: #a78bfa; }
+  #app.dark .mode-btn, #app.dark .fullscreen-btn {
+    color: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.07);
+    border-color: rgba(255,255,255,0.12);
+  }
+  #app.dark .mode-btn:hover, #app.dark .fullscreen-btn:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.13);
+  }
+  #app.dark .scan-panel {
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  #app.dark .scan-input {
+    background: rgba(0,0,0,0.4);
+    border-color: rgba(255,255,255,0.15);
+    color: #fff;
+  }
+  #app.dark .scan-input::placeholder { color: rgba(255,255,255,0.2); }
+  #app.dark .scan-input:focus {
+    border-color: rgba(120,80,255,0.6);
+    background: rgba(120,80,255,0.07);
+    box-shadow: 0 0 0 3px rgba(120,80,255,0.12);
+  }
+  #app.dark .queue-badge { display: none; }
+  #app.dark .tbl-label { color: rgba(255,255,255,0.5); }
+  #app.dark .hapus-btn {
+    background: rgba(220,40,40,0.2);
+    border-color: rgba(220,40,40,0.4);
+    color: #f87171;
+  }
+  #app.dark .hapus-btn:hover {
+    background: rgba(220,40,40,0.35);
+    color: #fff;
+  }
+  #app.dark .upload-btn {
+    background: rgba(255,255,255,0.07);
+    border-color: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.6);
+  }
+  #app.dark .upload-btn:hover {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+  }
+  #app.dark .upload-btn.loaded {
+    border-color: rgba(0,200,120,0.4);
+    color: #00d48a;
+    background: rgba(0,200,120,0.08);
+  }
+  #app.dark .table-wrap {
+    background: rgba(0,0,0,0.25);
+    border-color: rgba(255,255,255,0.1);
+  }
+  #app.dark thead tr {
+    backdrop-filter: blur(10px);
+    background: rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  #app.dark thead th { color: rgba(255,255,255,0.4); }
+  #app.dark tbody tr { border-bottom: 1px solid rgba(255,255,255,0.05); }
+  #app.dark tbody tr:hover { background: rgba(255,255,255,0.04); }
+  #app.dark td { color: rgba(255,255,255,0.75); }
+  #app.dark td.no-col { color: rgba(255,255,255,0.25); width: 5px; }
+  #app.dark td.waktu-col { color: rgba(255,255,255,0.35); width: 60px; }
+  #app.dark td.kupon-col { color: #fff; }
+  #app.dark td.hadiah-col { color: rgba(255,255,255,0.65); }
+  #app.dark .empty-row td { color: rgba(255,255,255,0.18); }
+  #app.dark .divider-row td {
+    background: rgba(167,139,250,0.08);
+    color: #c4b5fd;
+    border-top: 1px solid rgba(167,139,250,0.2);
+    border-bottom: 1px solid rgba(167,139,250,0.2);
+  }
+  #app.dark .result-banner.win {
+    background: rgba(0,200,120,0.12);
+    border-color: rgba(0,200,120,0.45);
+    color: #00d48a;
+  }
+  #app.dark .result-banner.lose {
+    background: rgba(220,40,40,0.1);
+    border-color: rgba(220,40,40,0.4);
+    color: #ff6b5b;
+  }
+  #app.dark .badge-menang {
+    color: #fbbf24;
+    background: rgba(234,179,8,0.2);
+    border-color: rgba(234,179,8,0.5);
+  }
+  #app.dark .badge-belum {
+    color: #f87171;
+    background: rgba(220,40,40,0.15);
+    border-color: rgba(220,40,40,0.4);
+  }
+  #app.dark .tbl-scroll::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.3); }
+  #app.dark .tbl-scroll::-webkit-scrollbar-thumb:hover { background: rgba(167,139,250,0.55); }
+
+  /* Shared */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    flex-shrink: 0;
+  }
+  .topbar-clock {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+  .topbar-title {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+  .topbar-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  .mode-btn, .fullscreen-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .scan-panel {
+    padding: 14px 20px;
+    flex-shrink: 0;
+  }
+  .scan-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .scan-input {
+    flex: 1;
+    border-radius: 10px;
+    padding: 13px 18px;
+    font-size: 16px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    letter-spacing: 3px;
+    outline: none;
+    transition: all 0.25s;
+    text-transform: uppercase;
+    border: 1px solid;
+  }
+  .scan-input::placeholder {
+    letter-spacing: 1px;
+    font-size: 12px;
+    text-transform: none;
+  }
+  .cek-btn {
+    padding: 0 28px;
+    height: 50px;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .cek-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(124,58,237,0.45);
+  }
+  .cek-btn:active {
+    transform: scale(0.97);
+  }
+  .queue-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 16px;
+    height: 50px;
+    border-radius: 10px;
+    border: 1px solid;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.25s;
+  }
+  .result-banner {
+    margin-top: 10px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-align: center;
+    text-transform: uppercase;
+    display: none;
+    animation: fadeIn 0.3s ease;
+    border: 1px solid;
+  }
+  .result-banner.win,
+  .result-banner.lose {
+    display: block;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* FIX: table-section mengambil sisa ruang dengan min-height: 0 agar tidak overflow */
+  .table-section {
+    flex: 1 1 0;
+    min-height: 0;
+    padding: 14px 20px 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .table-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+  .toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .toolbar-right {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+  }
+  .tbl-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+  }
+  .hapus-btn {
+    padding: 6px 14px;
+    border-radius: 7px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid;
+  }
+  input[type="file"] { display: none; }
+  .upload-btn {
+    padding: 6px 14px;
+    border-radius: 7px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    border: 1px solid;
+  }
+  .export-btn {
+    padding: 6px 16px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #065f46, #047857);
+    border: 1px solid rgba(0,200,120,0.3);
+    color: #fff;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .export-btn:hover { opacity: 0.85; }
+
+  /* FIX: table-wrap mengisi sisa dan tidak overflow keluar */
+  .table-wrap {
+    flex: 1 1 0;
+    min-height: 0;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid;
+    display: flex;
+    flex-direction: column;
+  }
+  .tbl-scroll {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  .tbl-scroll::-webkit-scrollbar { width: 6px; }
+  .tbl-scroll::-webkit-scrollbar-track { background: transparent; }
+  .tbl-scroll::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    transition: background 0.2s;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  thead tr {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+  }
+  thead th {
+    padding: 11px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-align: left;
+    white-space: nowrap;
+  }
+  thead th:last-child { text-align: center; }
+  tbody tr {
+    transition: background 0.15s;
+    animation: fadeIn 0.25s ease;
+  }
+  tbody td {
+    padding: 11px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+  }
+  td.no-col { width: 40px; }
+  td.waktu-col { white-space: nowrap; font-size: 11px; }
+  td.kupon-col { letter-spacing: 2px; }
+  .badge-menang,
+  .badge-belum {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: 1px solid;
+  }
+  .divider-row td {
+    padding: 7px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .empty-row td {
+    text-align: center;
+    padding: 40px;
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
   .result-banner.win {
     animation: glowPulse 1.2s ease-in-out infinite, fadeIn 0.4s ease;
-    box-shadow: 0 0 15px 2px rgba(0, 200, 120, 0.6), 0 0 30px 5px rgba(0, 255, 150, 0.3);
+    box-shadow: 0 0 15px 2px rgba(0,200,120,0.6), 0 0 30px 5px rgba(0,255,150,0.3);
     border-width: 1.5px;
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: 1.5px;
     backdrop-filter: blur(4px);
     padding: 18px 22px;
     font-size: 1.25rem;
     font-weight: 800;
   }
-
   @keyframes glowPulse {
-    0% { box-shadow: 0 0 5px 1px rgba(0, 220, 120, 0.5), 0 0 15px 3px rgba(0, 200, 100, 0.3); text-shadow: 0 0 2px rgba(0,255,150,0.5); }
-    50% { box-shadow: 0 0 20px 6px rgba(0, 255, 150, 0.9), 0 0 40px 12px rgba(0, 200, 100, 0.5); text-shadow: 0 0 6px rgba(0,255,150,0.9); }
-    100% { box-shadow: 0 0 5px 1px rgba(0, 220, 120, 0.5), 0 0 15px 3px rgba(0, 200, 100, 0.3); text-shadow: 0 0 2px rgba(0,255,150,0.5); }
+    0%   { box-shadow: 0 0 5px 1px rgba(0,220,120,0.5), 0 0 15px 3px rgba(0,200,100,0.3); text-shadow: 0 0 2px rgba(0,255,150,0.5); }
+    50%  { box-shadow: 0 0 20px 6px rgba(0,255,150,0.9), 0 0 40px 12px rgba(0,200,100,0.5); text-shadow: 0 0 6px rgba(0,255,150,0.9); }
+    100% { box-shadow: 0 0 5px 1px rgba(0,220,120,0.5), 0 0 15px 3px rgba(0,200,100,0.3); text-shadow: 0 0 2px rgba(0,255,150,0.5); }
   }
-
   #app.light .result-banner.win {
-    box-shadow: 0 0 12px 3px rgba(0, 180, 100, 0.7), 0 0 25px 8px rgba(0, 220, 120, 0.4);
+    box-shadow: 0 0 12px 3px rgba(0,180,100,0.7), 0 0 25px 8px rgba(0,220,120,0.4);
     animation: glowPulseLight 1.2s ease-in-out infinite;
   }
-
   @keyframes glowPulseLight {
-    0% { box-shadow: 0 0 6px 2px rgba(0, 160, 80, 0.5); text-shadow: 0 0 1px #065f46; }
-    50% { box-shadow: 0 0 22px 8px rgba(0, 220, 120, 0.9), 0 0 35px 12px rgba(0, 200, 100, 0.6); text-shadow: 0 0 5px #00d48a; }
-    100% { box-shadow: 0 0 6px 2px rgba(0, 160, 80, 0.5); text-shadow: 0 0 1px #065f46; }
+    0%   { box-shadow: 0 0 6px 2px rgba(0,160,80,0.5); text-shadow: 0 0 1px #065f46; }
+    50%  { box-shadow: 0 0 22px 8px rgba(0,220,120,0.9), 0 0 35px 12px rgba(0,200,100,0.6); text-shadow: 0 0 5px #00d48a; }
+    100% { box-shadow: 0 0 6px 2px rgba(0,160,80,0.5); text-shadow: 0 0 1px #065f46; }
+  }
+
+  /* Zoom control */
+  .zoom-control {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 8px 20px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    flex-shrink: 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+  }
+  #app.light .zoom-control {
+    background: rgba(0,0,0,0.03);
+    border-top-color: rgba(0,0,0,0.1);
+    color: #1e0d5c;
+  }
+  #app.dark .zoom-control {
+    background: rgba(255,255,255,0.03);
+    border-top-color: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.7);
+  }
+  .zoom-label { letter-spacing: 1px; }
+  .zoom-slider {
+    width: 160px;
+    cursor: pointer;
+    accent-color: #7c3aed;
+  }
+  .zoom-value { min-width: 45px; text-align: right; }
+
+  /* Overlay fullscreen */
+  #fullscreen-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, #c9b8f0 0%, #b8d0f5 40%, #a8e6d0 100%);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  #fullscreen-overlay.hide {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .overlay-card {
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(20px);
+    border-radius: 32px;
+    padding: 40px 32px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.4);
+    max-width: 90%;
+    width: 420px;
+    box-shadow: 0 25px 45px rgba(0,0,0,0.2);
+    animation: fadeUp 0.5s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .overlay-card h2 { color: #1e0d5c; font-size: 28px; margin-bottom: 8px; letter-spacing: 2px; }
+  .overlay-card h2 span { color: #7c3aed; }
+  .overlay-sub {
+    color: #2d1b69;
+    margin-bottom: 28px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0.7;
+  }
+  .overlay-upload-zone {
+    border: 2px dashed rgba(124,58,237,0.4);
+    border-radius: 16px;
+    padding: 28px 20px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: all 0.25s;
+    background: rgba(255,255,255,0.2);
+  }
+  .overlay-upload-zone:hover {
+    border-color: rgba(124,58,237,0.8);
+    background: rgba(255,255,255,0.35);
+  }
+  .overlay-upload-zone.has-file {
+    border-color: rgba(0,160,100,0.6);
+    background: rgba(0,200,120,0.08);
+  }
+  .overlay-upload-icon { font-size: 32px; margin-bottom: 10px; display: block; }
+  .overlay-upload-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: rgba(30,13,92,0.6);
+    letter-spacing: 1px;
+    display: block;
+  }
+  .overlay-kupon-info {
+    font-family: 'DM Mono', monospace;
+    font-size: 24px;
+    font-weight: 500;
+    color: #065f46;
+    display: block;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+  .overlay-kupon-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(6,95,70,0.7);
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .overlay-reupload-hint {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(30,13,92,0.4);
+    letter-spacing: 1px;
+    display: block;
+    margin-top: 8px;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .overlay-reupload-hint:hover { color: rgba(124,58,237,0.7); }
+  #confirmFullscreenBtn {
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    border: none;
+    padding: 14px 28px;
+    border-radius: 40px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    font-family: 'Syne', sans-serif;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+    letter-spacing: 1px;
+    width: 100%;
+  }
+  #confirmFullscreenBtn:hover:not(:disabled) { transform: scale(1.02); box-shadow: 0 10px 25px rgba(124,58,237,0.4); }
+  #confirmFullscreenBtn:active:not(:disabled) { transform: scale(0.98); }
+  #confirmFullscreenBtn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    filter: grayscale(0.4);
   }
 </style>
 </head>
 <body>
+
+<div id="fullscreen-overlay">
+  <div class="overlay-card">
+    <h2>🎫 <span>Checker</span> Kupon</h2>
+    <p class="overlay-sub">Upload master kupon untuk memulai</p>
+
+    <input type="file" id="overlayFileInput" accept=".xlsx,.xls,.csv">
+
+    <!-- State: belum upload -->
+    <div class="overlay-upload-zone" id="overlayUploadZone">
+      <span class="overlay-upload-icon">📂</span>
+      <span class="overlay-upload-label">Klik untuk upload file Excel</span>
+      <span class="overlay-upload-label" style="margin-top:4px;font-size:10px;opacity:0.6">(.xlsx / .xls / .csv)</span>
+    </div>
+
+    <!-- State: sudah upload (tersembunyi sampai ada data) -->
+    <div class="overlay-upload-zone has-file" id="overlayFileInfo" style="display:none;">
+      <span class="overlay-upload-icon">✅</span>
+      <span class="overlay-kupon-info" id="overlayKuponCount">0 Kupon</span>
+      <span class="overlay-kupon-sub" id="overlayFileName">—</span>
+      <span class="overlay-reupload-hint" id="overlayReuploadBtn">↺ Ganti file</span>
+    </div>
+
+    <button id="confirmFullscreenBtn" disabled>✨ Masuk ke Layar Penuh ✨</button>
+  </div>
+</div>
+
+<div class="app-scale-wrapper">
 <div id="app" class="light">
   <div class="bg-orb1"></div>
   <div class="bg-orb2"></div>
@@ -233,7 +801,6 @@
     <div class="topbar-clock" id="clock">--/--/---- --:--:--</div>
     <div class="topbar-title">Checker <span>Kupon</span> Undian</div>
     <div class="topbar-buttons">
-      <button class="install-btn" id="installBtn" style="display:none;">📲 Install</button>
       <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶</button>
       <button class="mode-btn" onclick="toggleTheme()">🌓</button>
     </div>
@@ -278,10 +845,16 @@
       </div>
     </div>
   </div>
+
+  <div class="zoom-control">
+    <span class="zoom-label">🔍 Zoom Tampilan</span>
+    <input type="range" id="zoomSlider" class="zoom-slider" min="0.8" max="1.5" step="0.01" value="1">
+    <span id="zoomValue" class="zoom-value">100%</span>
+  </div>
+</div>
 </div>
 
 <script>
-  // --- FUNGSI UTAMA APLIKASI (Checker) ---
   let couponDB = {};
   let history = [];
   let currentQueue = 1;
@@ -323,12 +896,20 @@
   setInterval(updateClock, 1000);
   updateClock();
 
-  loadStorage();
-  if (Object.keys(couponDB).length > 0) {
+  function syncMainUploadBtn() {
+    const count = Object.keys(couponDB).length;
     const btn = document.getElementById('uploadBtn');
-    btn.textContent = '✓ ' + Object.keys(couponDB).length + ' Kupon';
-    btn.classList.add('loaded');
+    if (count > 0) {
+      btn.textContent = '✓ ' + count.toLocaleString('id-ID') + ' Kupon';
+      btn.classList.add('loaded');
+    } else {
+      btn.textContent = 'Upload List Kupon';
+      btn.classList.remove('loaded');
+    }
   }
+
+  loadStorage();
+  syncMainUploadBtn();
   updateQueueBadge();
   if (history.length > 0) renderHistory();
   newQueue();
@@ -352,9 +933,8 @@
           couponDB[code] = prize;
           count++;
         }
-        const btn = document.getElementById('uploadBtn');
-        btn.textContent = '✓ ' + count + ' Kupon';
-        btn.classList.add('loaded');
+        localStorage.setItem('kupon_filename', file.name);
+        syncMainUploadBtn();
         saveStorage();
       } catch(err) {
         alert('Gagal membaca file. Format: kolom A = Nomor Kupon, kolom B = Hadiah');
@@ -375,7 +955,7 @@
   });
 
   function newQueue() {
-    if (currentQueueCount === 0) return; 
+    if (currentQueueCount === 0) return;
     currentQueue++;
     currentQueueCount = 0;
     updateQueueBadge();
@@ -388,7 +968,7 @@
   function checkCoupon() {
     const raw = document.getElementById('couponInput').value.trim();
     if (!raw) return;
-    
+
     const banner = document.getElementById('resultBanner');
     banner.className = 'result-banner';
 
@@ -456,7 +1036,7 @@
           <td class="waktu-col">${h.waktu}</td>
           <td class="kupon-col">${h.code}</td>
           <td class="hadiah-col">${h.prize}</td>
-         </tr>`;
+        </tr>`;
     }).join('');
   }
 
@@ -481,10 +1061,18 @@
     XLSX.writeFile(wb, 'pemenang_kupon.xlsx');
   }
 
-  let isDark = true;
+  let isDark = false;
   function toggleTheme() {
     isDark = !isDark;
     document.getElementById('app').className = isDark ? 'dark' : 'light';
+    const htmlElem = document.documentElement;
+    if (isDark) {
+      htmlElem.classList.remove('light-bg');
+      htmlElem.classList.add('dark-bg');
+    } else {
+      htmlElem.classList.remove('dark-bg');
+      htmlElem.classList.add('light-bg');
+    }
   }
 
   function toggleFullscreen() {
@@ -497,109 +1085,119 @@
     }
   }
 
-  // ========== PWA: Manifest + Service Worker + Tombol Install Manual ==========
-  (function initPWA() {
-    if (location.protocol === 'file:') {
-      console.warn('PWA tidak dapat diinstall karena dijalankan via file://. Gunakan localhost atau HTTPS.');
-      return;
+  // Zoom slider — pakai transform:scale pada #app, BUKAN body.style.zoom
+  // Agar #app tetap 100vw x 100vh secara layout, kita perbesar visually saja via scale
+  // tapi karena scale mengecilkan/membesarkan dari pojok kiri atas, kita perlu
+  // menyesuaikan width/height #app agar konten tetap fill saat zoom out
+  const appEl = document.getElementById('app');
+  const zoomSlider = document.getElementById('zoomSlider');
+  const zoomValueSpan = document.getElementById('zoomValue');
+
+  function applyZoom(val) {
+    // Saat scale < 1, konten mengecil dan ada ruang kosong.
+    // Kompensasi: perbesar #app sesuai inverse scale agar tetap mengisi layar.
+    const inverse = 1 / val;
+    appEl.style.transform = `scale(${val})`;
+    appEl.style.transformOrigin = 'top left';
+    appEl.style.width = (inverse * 100) + 'vw';
+    appEl.style.height = (inverse * 100) + 'vh';
+  }
+
+  const savedZoom = localStorage.getItem('appZoom');
+  if (savedZoom) {
+    const zoom = parseFloat(savedZoom);
+    if (!isNaN(zoom) && zoom >= 0.8 && zoom <= 1.5) {
+      zoomSlider.value = zoom;
+      zoomValueSpan.textContent = Math.round(zoom * 100) + '%';
+      applyZoom(zoom);
+    }
+  }
+  zoomSlider.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value);
+    zoomValueSpan.textContent = Math.round(val * 100) + '%';
+    applyZoom(val);
+    localStorage.setItem('appZoom', val);
+  });
+
+  document.documentElement.classList.add('light-bg');
+
+  // ========== OVERLAY: UPLOAD FILE DULU, BARU MASUK FULLSCREEN ==========
+  (function initOverlay() {
+    const overlay       = document.getElementById('fullscreen-overlay');
+    const confirmBtn    = document.getElementById('confirmFullscreenBtn');
+    const overlayInput  = document.getElementById('overlayFileInput');
+    const uploadZone    = document.getElementById('overlayUploadZone');
+    const fileInfo      = document.getElementById('overlayFileInfo');
+    const kuponCount    = document.getElementById('overlayKuponCount');
+    const fileNameEl    = document.getElementById('overlayFileName');
+    const reuploadBtn   = document.getElementById('overlayReuploadBtn');
+
+    // Cek apakah sudah ada data kupon di localStorage
+    function refreshOverlayState() {
+      const count = Object.keys(couponDB).length;
+      if (count > 0) {
+        // Sudah ada data — tampilkan info, aktifkan tombol
+        uploadZone.style.display = 'none';
+        fileInfo.style.display   = 'block';
+        kuponCount.textContent   = count.toLocaleString('id-ID') + ' Kupon';
+        const savedName = localStorage.getItem('kupon_filename') || 'Data tersimpan';
+        fileNameEl.textContent   = savedName;
+        confirmBtn.disabled      = false;
+      } else {
+        // Belum ada data
+        uploadZone.style.display = 'block';
+        fileInfo.style.display   = 'none';
+        confirmBtn.disabled      = true;
+      }
     }
 
-    // --- Buat manifest blob dan pasang ---
-    const manifestObj = {
-      name: "Checker Kupon Undian",
-      short_name: "CheckerKupon",
-      description: "Cek nomor kupon undian dan riwayat",
-      start_url: ".",
-      display: "standalone",
-      theme_color: "#7c3aed",
-      background_color: "#0f0c29",
-      icons: [
-        {
-          src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%237c3aed'/%3E%3Ctext x='256' y='350' font-size='280' text-anchor='middle' fill='white' font-family='monospace'%3E🎫%3C/text%3E%3C/svg%3E",
-          sizes: "512x512",
-          type: "image/svg+xml"
-        },
-        {
-          src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%237c3aed'/%3E%3Ctext x='96' y='130' font-size='100' text-anchor='middle' fill='white' font-family='monospace'%3E🎫%3C/text%3E%3C/svg%3E",
-          sizes: "192x192",
-          type: "image/svg+xml"
+    refreshOverlayState();
+
+    // Klik zona upload → buka file picker
+    uploadZone.addEventListener('click', () => overlayInput.click());
+    // Tombol ganti file
+    reuploadBtn.addEventListener('click', () => overlayInput.click());
+
+    // Proses file yang dipilih di overlay
+    overlayInput.addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        try {
+          const wb   = XLSX.read(ev.target.result, { type: 'binary' });
+          const ws   = wb.Sheets[wb.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+          couponDB = {};
+          let count = 0;
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (!row || !row[0]) continue;
+            const code  = String(row[0]).trim().toUpperCase();
+            const prize = row[1] ? String(row[1]).trim() : 'Hadiah';
+            couponDB[code] = prize;
+            count++;
+          }
+          localStorage.setItem('kupon_filename', file.name);
+          saveStorage();
+          // Sinkronisasi tombol upload di toolbar utama
+          syncMainUploadBtn();
+          refreshOverlayState();
+        } catch(err) {
+          alert('Gagal membaca file. Format: kolom A = Nomor Kupon, kolom B = Hadiah');
         }
-      ]
-    };
-    const manifestBlob = new Blob([JSON.stringify(manifestObj)], {type: 'application/json'});
-    const manifestURL = URL.createObjectURL(manifestBlob);
-    const manifestLink = document.createElement('link');
-    manifestLink.rel = 'manifest';
-    manifestLink.href = manifestURL;
-    document.head.appendChild(manifestLink);
-
-    // --- Service Worker sederhana (cache offline) ---
-    const swScript = `
-      const CACHE_NAME = 'kupon-checker-v1';
-      const urlsToCache = [
-        './',
-        '${location.pathname}',
-        'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
-        'https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap'
-      ];
-
-      self.addEventListener('install', event => {
-        event.waitUntil(
-          caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
-        );
-        self.skipWaiting();
-      });
-
-      self.addEventListener('fetch', event => {
-        event.respondWith(
-          caches.match(event.request).then(response => {
-            if (response) return response;
-            return fetch(event.request).then(fetchRes => {
-              if (!fetchRes || fetchRes.status !== 200 || fetchRes.type !== 'basic') return fetchRes;
-              const responseToCache = fetchRes.clone();
-              caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseToCache));
-              return fetchRes;
-            });
-          })
-        );
-      });
-
-      self.addEventListener('activate', event => {
-        event.waitUntil(
-          caches.keys().then(keys => Promise.all(keys.map(key => {
-            if (key !== CACHE_NAME) return caches.delete(key);
-          })))
-        );
-        self.clients.claim();
-      });
-    `;
-    const swBlob = new Blob([swScript], {type: 'application/javascript'});
-    const swURL = URL.createObjectURL(swBlob);
-    
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register(swURL).then(reg => {
-        console.log('Service Worker terdaftar', reg);
-      }).catch(err => {
-        console.warn('Gagal daftar service worker:', err);
-      });
-    }
-
-    // --- Tangkap event beforeinstallprompt untuk menampilkan tombol install manual ---
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const installBtn = document.getElementById('installBtn');
-      if (installBtn) installBtn.style.display = 'flex';
+      };
+      reader.readAsBinaryString(file);
+      this.value = '';
     });
 
-    document.getElementById('installBtn')?.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(`User response to install: ${outcome}`);
-      deferredPrompt = null;
-      document.getElementById('installBtn').style.display = 'none';
+    // Tombol masuk fullscreen
+    confirmBtn.addEventListener('click', () => {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.warn('Gagal masuk fullscreen:', err);
+      });
+      overlay.classList.add('hide');
+      setTimeout(() => { overlay.style.display = 'none'; }, 500);
     });
   })();
 </script>

@@ -715,7 +715,7 @@
 
   <div class="zoom-control">
     <span class="zoom-label">🔍 Zoom Tampilan</span>
-    <input type="range" id="zoomSlider" class="zoom-slider" min="0.8" max="1.5" step="0.05" value="1">
+    <input type="range" id="zoomSlider" class="zoom-slider" min="0.8" max="1.5" step="0.05" value="1.5">
     <span id="zoomValue" class="zoom-value">100%</span>
   </div>
 </div>
@@ -775,7 +775,6 @@
     }
   }
 
-  // ==================== PERUBAHAN UTAMA ====================
   document.getElementById('couponInput').addEventListener('keydown', e => {
     if (e.key !== 'Enter') return;
     
@@ -803,7 +802,7 @@
     if (raw.length !== 6) {
       banner.className = 'result-banner lose';
       banner.textContent = '⚠️ Cek nomor kupon! Harus 6 karakter.';
-      document.getElementById('couponInput').value = '';
+      // Input TIDAK dikosongkan — biarkan user koreksi
       document.getElementById('couponInput').focus();
       return;
     }
@@ -925,13 +924,11 @@
   }
 
   const savedZoom = localStorage.getItem('appZoom');
-  if (savedZoom) {
-    const zoom = parseFloat(savedZoom);
-    if (!isNaN(zoom) && zoom >= 0.8 && zoom <= 1.5) {
-      zoomSlider.value = zoom;
-      zoomValueSpan.textContent = Math.round(zoom * 100) + '%';
-      applyZoom(zoom);
-    }
+  const initialZoom = savedZoom ? parseFloat(savedZoom) : 1.5;
+  if (!isNaN(initialZoom) && initialZoom >= 0.8 && initialZoom <= 1.5) {
+    zoomSlider.value = initialZoom;
+    zoomValueSpan.textContent = Math.round(initialZoom * 100) + '%';
+    applyZoom(initialZoom);
   }
   zoomSlider.addEventListener('input', (e) => {
     const val = parseFloat(e.target.value);

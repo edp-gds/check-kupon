@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Checker Kupon Undian</title>
 <meta name="theme-color" content="#7c3aed">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   * {
@@ -13,22 +14,13 @@
     padding: 0;
   }
 
-  html, body {
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-  }
+  html, body { height: 100%; width: 100%; overflow: hidden; margin: 0; padding: 0; }
 
   html {
     transition: background 0.4s;
   }
   html.light-bg {
     background: linear-gradient(135deg, #c9b8f0 0%, #b8d0f5 40%, #a8e6d0 100%);
-  }
-  html.dark-bg {
-    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
   }
 
   body {
@@ -47,17 +39,12 @@
     left: 0;
   }
 
-  :root {
-    --font-ui: 'Segoe UI', 'Arial', sans-serif;
-    --font-mono: 'Consolas', 'Courier New', monospace;
-  }
-
   #app {
     width: 100vw;
     height: 100vh;
     display: flex;
     flex-direction: column;
-    font-family: var(--font-ui);
+    font-family: 'Syne', sans-serif;
     transition: background 0.4s;
     position: relative;
     overflow: hidden;
@@ -98,8 +85,19 @@
     position: relative;
     z-index: 5;
   }
+  #app.light .topbar-clock { color: rgba(50,30,110,0.65); }
   #app.light .topbar-title { color: #1e0d5c; }
   #app.light .topbar-title span { color: #7c3aed; }
+  #app.light .mode-btn, #app.light .fullscreen-btn {
+    color: rgba(50,30,110,0.7);
+    background: rgba(255,255,255,0.4);
+    border-color: rgba(255,255,255,0.75);
+    backdrop-filter: blur(10px);
+  }
+  #app.light .mode-btn:hover, #app.light .fullscreen-btn:hover {
+    background: rgba(255,255,255,0.65);
+    color: #1e0d5c;
+  }
   #app.light .scan-panel {
     background: rgba(255,255,255,0.22);
     backdrop-filter: blur(20px);
@@ -151,24 +149,18 @@
     backdrop-filter: blur(1px);
     border-color: rgba(255,255,255,0.5);
   }
-  #app.light .table-header {
-    background: rgba(255,255,255,0.25);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255,255,255,0.5);
-  }
-  #app.light .table-header th {
-    color: rgba(25,13,92,0.8);
-    background: transparent;
-  }
-  #app.light .table-body {
-    background: rgba(255,255,255,0.1);
+  #app.light thead th { color: rgba(25,13,92,0.6); }
+  #app.light thead tr {
+    backdrop-filter: blur(30px);
+    background: rgba(255,255,255,0.7);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
   }
   #app.light tbody tr:hover { background: rgba(255,255,255,0.18); }
-  #app.light tbody td {
-    color: #1e0d5c;
-    font-family: var(--font-mono);
-    font-size: 12px;
-  }
+  #app.light td { color: #1e0d5c; }
+  #app.light td.no-col { color: rgba(30,13,92,0.32); width: 5px; }
+  #app.light td.waktu-col { color: rgba(30,13,92,0.48); width: 60px; }
+  #app.light td.kupon-col { color: #1e0d5c; font-weight: 600; }
+  #app.light td.hadiah-col { color: rgba(30,13,92,0.72); }
   #app.light .empty-row td { color: rgba(30,13,92,0.28); }
   #app.light .divider-row td {
     background: rgba(124,58,237,0.07);
@@ -186,199 +178,55 @@
     border-color: rgba(200,30,30,0.25);
     color: #b91c1c;
   }
-  #app.light .bottom-bar {
-    background: rgba(0,0,0,0.03);
-    border-top-color: rgba(0,0,0,0.1);
-    color: #1e0d5c;
+  #app.light .badge-menang {
+    color: #78350f;
+    background: rgba(234,179,8,0.14);
+    border-color: rgba(234,179,8,0.38);
   }
-  #app.light .bottom-clock { color: rgba(50,30,110,0.65); }
-  #app.light .mode-btn, #app.light .fullscreen-btn {
-    color: rgba(50,30,110,0.7);
-    background: rgba(255,255,255,0.4);
-    border-color: rgba(255,255,255,0.75);
-    backdrop-filter: blur(10px);
+  #app.light .badge-belum {
+    color: #991b1b;
+    background: rgba(220,40,40,0.07);
+    border-color: rgba(220,40,40,0.25);
   }
-  #app.light .mode-btn:hover, #app.light .fullscreen-btn:hover {
-    background: rgba(255,255,255,0.65);
-    color: #1e0d5c;
-  }
+  #app.light .tbl-scroll::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.2); }
+  #app.light .tbl-scroll::-webkit-scrollbar-thumb:hover { background: rgba(124,58,237,0.4); }
 
-  /* Dark theme */
-  #app.dark {
-    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-  }
-  #app.dark .topbar {
-    background: rgba(0,0,0,0.4);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-  #app.dark .topbar-title { color: #fff; }
-  #app.dark .topbar-title span { color: #a78bfa; }
-  #app.dark .mode-btn, #app.dark .fullscreen-btn {
-    color: rgba(255,255,255,0.5);
-    background: rgba(255,255,255,0.07);
-    border-color: rgba(255,255,255,0.12);
-  }
-  #app.dark .mode-btn:hover, #app.dark .fullscreen-btn:hover {
-    color: #fff;
-    background: rgba(255,255,255,0.13);
-  }
-  #app.dark .scan-panel {
-    background: rgba(255,255,255,0.04);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-  #app.dark .scan-input {
-    background: rgba(0,0,0,0.4);
-    border-color: rgba(255,255,255,0.15);
-    color: #fff;
-  }
-  #app.dark .scan-input::placeholder { color: rgba(255,255,255,0.2); }
-  #app.dark .scan-input:focus {
-    border-color: rgba(120,80,255,0.6);
-    background: rgba(120,80,255,0.07);
-    box-shadow: 0 0 0 3px rgba(120,80,255,0.12);
-  }
-  #app.dark .queue-badge { display: none; }
-  #app.dark .tbl-label { color: rgba(255,255,255,0.5); }
-  #app.dark .hapus-btn {
-    background: rgba(220,40,40,0.2);
-    border-color: rgba(220,40,40,0.4);
-    color: #f87171;
-  }
-  #app.dark .hapus-btn:hover {
-    background: rgba(220,40,40,0.35);
-    color: #fff;
-  }
-  #app.dark .upload-btn {
-    background: rgba(255,255,255,0.07);
-    border-color: rgba(255,255,255,0.15);
-    color: rgba(255,255,255,0.6);
-  }
-  #app.dark .upload-btn:hover {
-    background: rgba(255,255,255,0.12);
-    color: #fff;
-  }
-  #app.dark .upload-btn.loaded {
-    border-color: rgba(0,200,120,0.4);
-    color: #00d48a;
-    background: rgba(0,200,120,0.08);
-  }
-  #app.dark .table-wrap {
-    background: rgba(0,0,0,0.25);
-    border-color: rgba(255,255,255,0.1);
-  }
-  #app.dark .table-header {
-    background: rgba(0,0,0,0.45);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-  #app.dark .table-header th {
-    color: rgba(255,255,255,0.7);
-    background: transparent;
-  }
-  #app.dark .table-body {
-    background: rgba(0,0,0,0.2);
-  }
-  #app.dark tbody tr { border-bottom: 1px solid rgba(255,255,255,0.05); }
-  #app.dark tbody tr:hover { background: rgba(255,255,255,0.04); }
-  #app.dark tbody td {
-    color: rgba(255,255,255,0.75);
-    font-family: var(--font-mono);
-    font-size: 12px;
-  }
-  #app.dark .empty-row td { color: rgba(255,255,255,0.18); }
-  #app.dark .divider-row td {
-    background: rgba(167,139,250,0.08);
-    color: #c4b5fd;
-    border-top: 1px solid rgba(167,139,250,0.2);
-    border-bottom: 1px solid rgba(167,139,250,0.2);
-  }
-  #app.dark .result-banner.win {
-    background: rgba(0,200,120,0.12);
-    border-color: rgba(0,200,120,0.45);
-    color: #00d48a;
-  }
-  #app.dark .result-banner.lose {
-    background: rgba(220,40,40,0.1);
-    border-color: rgba(220,40,40,0.4);
-    color: #ff6b5b;
-  }
-  #app.dark .bottom-bar {
-    background: rgba(255,255,255,0.03);
-    border-top-color: rgba(255,255,255,0.1);
-    color: rgba(255,255,255,0.7);
-  }
-  #app.dark .bottom-clock { color: rgba(255,255,255,0.45); }
-
-  /* ===== SCROLLBAR KUSTOM + AUTO HIDE ===== */
-  .table-body {
-    scrollbar-width: thin; /* Firefox */
-    transition: scrollbar-color 0.2s;
-  }
-  /* Webkit */
-  .table-body::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-    background: transparent;
-  }
-  .table-body::-webkit-scrollbar-track {
-    background: transparent;
-    margin-block: 2px;
-  }
-  .table-body::-webkit-scrollbar-thumb {
-    background: rgba(124,58,237,0.3);
-    border-radius: 10px;
-    transition: background 0.3s ease;
-  }
-  #app.light .table-body::-webkit-scrollbar-thumb {
-    background: rgba(124,58,237,0.25);
-  }
-  #app.dark .table-body::-webkit-scrollbar-thumb {
-    background: rgba(167,139,250,0.35);
-  }
-  /* Saat hover pada area scrollbar atau saat discroll (aktif) */
-  .table-body:hover::-webkit-scrollbar-thumb,
-  .table-body.scrolling::-webkit-scrollbar-thumb {
-    background: rgba(124,58,237,0.7);
-  }
-  #app.light .table-body:hover::-webkit-scrollbar-thumb,
-  #app.light .table-body.scrolling::-webkit-scrollbar-thumb {
-    background: rgba(124,58,237,0.8);
-  }
-  #app.dark .table-body:hover::-webkit-scrollbar-thumb,
-  #app.dark .table-body.scrolling::-webkit-scrollbar-thumb {
-    background: rgba(167,139,250,0.9);
-  }
-  /* Firefox */
-  .table-body {
-    scrollbar-color: rgba(124,58,237,0.3) transparent;
-  }
-  .table-body:hover {
-    scrollbar-color: rgba(124,58,237,0.7) transparent;
-  }
-  #app.dark .table-body {
-    scrollbar-color: rgba(167,139,250,0.35) transparent;
-  }
-  #app.dark .table-body:hover {
-    scrollbar-color: rgba(167,139,250,0.9) transparent;
-  }
-
-  /* ===== TOPBAR ===== */
+  /* Shared */
   .topbar {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     padding: 10px 20px;
     flex-shrink: 0;
   }
+  .topbar-clock {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
   .topbar-title {
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: 3px;
     text-transform: uppercase;
-    font-family: var(--font-ui);
   }
-
-  /* ===== SCAN PANEL ===== */
+  .topbar-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  .mode-btn, .fullscreen-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
   .scan-panel {
     padding: 14px 20px;
     flex-shrink: 0;
@@ -393,7 +241,7 @@
     border-radius: 10px;
     padding: 13px 18px;
     font-size: 16px;
-    font-family: var(--font-mono);
+    font-family: 'DM Mono', monospace;
     font-weight: 500;
     letter-spacing: 3px;
     outline: none;
@@ -405,7 +253,6 @@
     letter-spacing: 1px;
     font-size: 12px;
     text-transform: none;
-    font-family: var(--font-ui);
   }
   .cek-btn {
     padding: 0 28px;
@@ -414,7 +261,7 @@
     border: none;
     border-radius: 10px;
     color: #fff;
-    font-family: var(--font-ui);
+    font-family: 'Syne', sans-serif;
     font-size: 13px;
     font-weight: 700;
     cursor: pointer;
@@ -427,7 +274,9 @@
     transform: translateY(-1px);
     box-shadow: 0 6px 18px rgba(124,58,237,0.45);
   }
-  .cek-btn:active { transform: scale(0.97); }
+  .cek-btn:active {
+    transform: scale(0.97);
+  }
   .queue-badge {
     display: flex;
     align-items: center;
@@ -436,7 +285,7 @@
     height: 50px;
     border-radius: 10px;
     border: 1px solid;
-    font-family: var(--font-mono);
+    font-family: 'DM Mono', monospace;
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 1px;
@@ -448,7 +297,7 @@
     margin-top: 10px;
     padding: 12px 18px;
     border-radius: 10px;
-    font-family: var(--font-mono);
+    font-family: 'DM Mono', monospace;
     font-size: 14px;
     font-weight: 500;
     letter-spacing: 1px;
@@ -459,13 +308,14 @@
     border: 1px solid;
   }
   .result-banner.win,
-  .result-banner.lose { display: block; }
+  .result-banner.lose {
+    display: block;
+  }
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* ===== TABLE SECTION (header & body terpisah) ===== */
   .table-section {
     flex: 1 1 0;
     min-height: 0;
@@ -496,12 +346,12 @@
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    font-family: var(--font-mono);
+    font-family: 'DM Mono', monospace;
   }
   .hapus-btn {
     padding: 6px 14px;
     border-radius: 7px;
-    font-family: var(--font-mono);
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -513,7 +363,7 @@
   .upload-btn {
     padding: 6px 14px;
     border-radius: 7px;
-    font-family: var(--font-mono);
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -528,7 +378,7 @@
     background: linear-gradient(135deg, #065f46, #047857);
     border: 1px solid rgba(0,200,120,0.3);
     color: #fff;
-    font-family: var(--font-mono);
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -541,37 +391,36 @@
   .table-wrap {
     flex: 1 1 0;
     min-height: 0;
-    border-radius: 12px;
+    border-radius: 4px;
+    overflow: hidden;
     border: 1px solid;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
   }
-  .table-header {
-    flex-shrink: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    border-bottom: 1px solid rgba(0,0,0,0.1);
+  .tbl-scroll {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
-  .table-body {
-    flex: 1;
-    overflow: auto;
-    transition: scrollbar-color 0.2s;
+  .tbl-scroll::-webkit-scrollbar { width: 6px; }
+  .tbl-scroll::-webkit-scrollbar-track { background: transparent; }
+  .tbl-scroll::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    transition: background 0.2s;
   }
-  .table-header table, .table-body table {
+  table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed;
   }
-  /* Lebar kolom seragam */
-  .table-header th:first-child, .table-body td:first-child { width: 55px; }
-  .table-header th:nth-child(2), .table-body td:nth-child(2) { width: 115px; }
-  .table-header th:nth-child(3), .table-body td:nth-child(3) { width: 105px; }
-  .table-header th:last-child, .table-body td:last-child { width: auto; }
-
-  .table-header th {
-    padding: 11px 8px;
-    font-family: var(--font-mono);
+  thead tr {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+  }
+  thead th {
+    padding: 11px 14px;
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
     font-weight: 500;
     letter-spacing: 1.5px;
@@ -579,20 +428,34 @@
     text-align: left;
     white-space: nowrap;
   }
-  .table-body td {
-    padding: 10px 8px;
-    font-family: var(--font-mono);
+  thead th:last-child { text-align: center; }
+  tbody tr {
+    transition: background 0.15s;
+    animation: fadeIn 0.25s ease;
+  }
+  tbody td {
+    padding: 11px 14px;
+    font-family: 'DM Mono', monospace;
     font-size: 12px;
-    white-space: nowrap;
+	font-weight: 500;
   }
-  .table-body td:last-child {
-    white-space: normal;
-    word-break: break-word;
+  td.no-col { width: 40px; }
+  td.waktu-col { width: 40px; white-space: nowrap; font-size: 11px; }
+  td.kupon-col { width: 40px; letter-spacing: 2px; font-size: 11px; }
+  .badge-menang,
+  .badge-belum {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: 1px solid;
   }
-
   .divider-row td {
-    padding: 7px 8px;
-    font-family: var(--font-mono);
+    padding: 7px 14px;
+    font-family: 'DM Mono', monospace;
     font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -603,10 +466,7 @@
     padding: 40px;
     font-size: 12px;
     letter-spacing: 1px;
-    font-family: var(--font-mono);
   }
-
-  /* Win glow */
   .result-banner.win {
     animation: glowPulse 1.2s ease-in-out infinite, fadeIn 0.4s ease;
     box-shadow: 0 0 15px 2px rgba(0,200,120,0.6), 0 0 30px 5px rgba(0,255,150,0.3);
@@ -631,52 +491,30 @@
     100% { box-shadow: 0 0 6px 2px rgba(0,160,80,0.5); text-shadow: 0 0 1px #065f46; }
   }
 
-  /* ===== BOTTOM BAR ===== */
-  .bottom-bar {
+  .zoom-control {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 12px;
-    padding: 7px 20px;
+    padding: 8px 20px;
     border-top: 1px solid rgba(255,255,255,0.2);
     flex-shrink: 0;
-    font-family: var(--font-mono);
+    font-family: 'DM Mono', monospace;
     font-size: 12px;
   }
-  .bottom-clock {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 1px;
-    white-space: nowrap;
-    flex-shrink: 0;
+  #app.light .zoom-control {
+    background: rgba(0,0,0,0.03);
+    border-top-color: rgba(0,0,0,0.1);
+    color: #1e0d5c;
   }
-  .bottom-spacer { flex: 1; }
-  .mode-btn, .fullscreen-btn {
-    font-family: var(--font-mono);
-    font-size: 16px;
-    padding: 4px 11px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    flex-shrink: 0;
-  }
+  .zoom-label { letter-spacing: 1px; }
   .zoom-slider {
-    width: 140px;
+    width: 160px;
     cursor: pointer;
     accent-color: #7c3aed;
-    flex-shrink: 0;
   }
-  .zoom-value {
-    min-width: 40px;
-    text-align: right;
-    flex-shrink: 0;
-  }
+  .zoom-value { min-width: 45px; text-align: right; }
 
-  /* ===== OVERLAY ===== */
   #fullscreen-overlay {
     position: fixed;
     top: 0; left: 0;
@@ -686,7 +524,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: var(--font-ui);
+    font-family: 'Syne', sans-serif;
     transition: opacity 0.5s ease, visibility 0.5s ease;
   }
   #fullscreen-overlay.hide {
@@ -709,12 +547,12 @@
     from { opacity: 0; transform: translateY(30px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-  .overlay-card h2 { color: #1e0d5c; font-size: 26px; margin-bottom: 8px; letter-spacing: 2px; font-family: var(--font-ui); font-weight: 700; }
+  .overlay-card h2 { color: #1e0d5c; font-size: 28px; margin-bottom: 8px; letter-spacing: 2px; }
   .overlay-card h2 span { color: #7c3aed; }
   .overlay-sub {
     color: #2d1b69;
     margin-bottom: 28px;
-    font-family: var(--font-mono);
+    font-family: 'DM Mono', monospace;
     font-size: 13px;
     font-weight: 500;
     opacity: 0.7;
@@ -738,14 +576,14 @@
   }
   .overlay-upload-icon { font-size: 32px; margin-bottom: 10px; display: block; }
   .overlay-upload-label {
-    font-family: var(--font-mono);
+    font-family: 'DM Mono', monospace;
     font-size: 12px;
     color: rgba(30,13,92,0.6);
     letter-spacing: 1px;
     display: block;
   }
   .overlay-kupon-info {
-    font-family: var(--font-mono);
+    font-family: 'DM Mono', monospace;
     font-size: 24px;
     font-weight: 500;
     color: #065f46;
@@ -754,7 +592,7 @@
     margin-bottom: 4px;
   }
   .overlay-kupon-sub {
-    font-family: var(--font-mono);
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
     color: rgba(6,95,70,0.7);
     letter-spacing: 1px;
@@ -762,7 +600,7 @@
     margin-bottom: 8px;
   }
   .overlay-reupload-hint {
-    font-family: var(--font-mono);
+    font-family: 'DM Mono', monospace;
     font-size: 10px;
     color: rgba(30,13,92,0.4);
     letter-spacing: 1px;
@@ -780,7 +618,7 @@
     font-size: 16px;
     font-weight: bold;
     color: white;
-    font-family: var(--font-ui);
+    font-family: 'Syne', sans-serif;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
     letter-spacing: 1px;
@@ -801,18 +639,22 @@
   <div class="overlay-card">
     <h2>🎫 <span>Checker</span> Kupon</h2>
     <p class="overlay-sub">Upload master kupon untuk memulai</p>
+
     <input type="file" id="overlayFileInput" accept=".xlsx,.xls,.csv">
+
     <div class="overlay-upload-zone" id="overlayUploadZone">
       <span class="overlay-upload-icon">📂</span>
       <span class="overlay-upload-label">Klik untuk upload file Excel</span>
       <span class="overlay-upload-label" style="margin-top:4px;font-size:10px;opacity:0.6">(.xlsx / .xls / .csv)</span>
     </div>
+
     <div class="overlay-upload-zone has-file" id="overlayFileInfo" style="display:none;">
       <span class="overlay-upload-icon">✅</span>
       <span class="overlay-kupon-info" id="overlayKuponCount">0 Kupon</span>
       <span class="overlay-kupon-sub" id="overlayFileName">—</span>
       <span class="overlay-reupload-hint" id="overlayReuploadBtn">↺ Ganti file</span>
     </div>
+
     <button id="confirmFullscreenBtn" disabled>Check Kupon</button>
   </div>
 </div>
@@ -823,7 +665,12 @@
   <div class="bg-orb2"></div>
 
   <div class="topbar">
+    <div class="topbar-clock" id="clock">--/--/---- --:--:--</div>
     <div class="topbar-title">Checker <span>Kupon</span> Undian</div>
+    <div class="topbar-buttons">
+      <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶</button>
+      
+    </div>
   </div>
 
   <div class="scan-panel">
@@ -848,15 +695,16 @@
       </div>
     </div>
     <div class="table-wrap">
-      <div class="table-header">
+      <div class="tbl-scroll">
         <table>
           <thead>
-            <tr><th>No</th><th>Waktu</th><th>Kupon</th><th>Hadiah</th></tr>
+            <tr>
+              <th>No</th>
+              <th>Waktu</th>
+              <th>Kupon</th>
+              <th>Hadiah</th>
+            </tr>
           </thead>
-        </table>
-      </div>
-      <div class="table-body" id="tableBody">
-        <table>
           <tbody id="historyBody">
             <tr class="empty-row"><td colspan="4">— Belum ada riwayat pengecekan —</td></tr>
           </tbody>
@@ -865,13 +713,9 @@
     </div>
   </div>
 
-  <div class="bottom-bar">
-    <span class="bottom-clock" id="clock">--/--/---- --:--:--</span>
-    <div class="bottom-spacer"></div>
-    <button class="mode-btn" onclick="toggleTheme()">🌓</button>
-    <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶</button>
-    <span class="mode-btn">🔍</span>
-    <input type="range" id="zoomSlider" class="zoom-slider" min="1" max="2" step="0.05" value="1">
+  <div class="zoom-control">
+    <span class="zoom-label">🔍 Zoom Tampilan</span>
+    <input type="range" id="zoomSlider" class="zoom-slider" min="0.8" max="1.5" step="0.05" value="1">
     <span id="zoomValue" class="zoom-value">100%</span>
   </div>
 </div>
@@ -882,22 +726,6 @@
   let history = [];
   let currentQueue = 1;
   let currentQueueCount = 0;
-
-  // Auto-hide scrollbar logic
-  const tableBody = document.querySelector('.table-body');
-  let scrollTimeout;
-  function handleScrollStart() {
-    if (!tableBody) return;
-    tableBody.classList.add('scrolling');
-    clearTimeout(scrollTimeout);
-    scrollTimeout = setTimeout(() => {
-      tableBody.classList.remove('scrolling');
-    }, 1000);
-  }
-  if (tableBody) {
-    tableBody.addEventListener('scroll', handleScrollStart);
-    // juga saat mouse enter area scrollbar (tapi cukup dengan hover CSS)
-  }
 
   function saveStorage() {
     try {
@@ -947,69 +775,36 @@
     }
   }
 
-  loadStorage();
-  syncMainUploadBtn();
-  updateQueueBadge();
-  if (history.length > 0) renderHistory();
-  newQueue();
-
-  document.getElementById('fileInput').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-      try {
-        const wb   = XLSX.read(ev.target.result, { type: 'binary' });
-        const ws   = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
-        couponDB = {};
-        let count = 0;
-        for (let i = 1; i < rows.length; i++) {
-          const row = rows[i];
-          if (!row || !row[0]) continue;
-          const code  = String(row[0]).trim().toUpperCase();
-          const prize = row[1] ? String(row[1]).trim() : 'Hadiah';
-          couponDB[code] = prize;
-          count++;
-        }
-        localStorage.setItem('kupon_filename', file.name);
-        syncMainUploadBtn();
-        saveStorage();
-      } catch(err) {
-        alert('Gagal membaca file. Format: kolom A = Nomor Kupon, kolom B = Hadiah');
-      }
-    };
-    reader.readAsBinaryString(file);
-    this.value = '';
-  });
-
+  // ==================== PERUBAHAN UTAMA ====================
   document.getElementById('couponInput').addEventListener('keydown', e => {
     if (e.key !== 'Enter') return;
-    const val = document.getElementById('couponInput').value.trim();
-    if (val === '') { newQueue(); } else { checkCoupon(); }
-  });
+    
+    const input = document.getElementById('couponInput');
+    const val = input.value.trim();
 
-  function newQueue() {
-    if (currentQueueCount === 0) return;
-    currentQueue++;
-    currentQueueCount = 0;
-    updateQueueBadge();
-    history.unshift({ type: 'divider', queue: currentQueue });
-    renderHistory();
-    saveStorage();
-    document.getElementById('resultBanner').className = 'result-banner';
-  }
+    if (val === '') {
+      newQueue();
+      input.focus();
+      return;
+    } 
+    checkCoupon();
+  });
 
   function checkCoupon() {
     const raw = document.getElementById('couponInput').value.trim();
     if (!raw) return;
 
     const banner = document.getElementById('resultBanner');
-    banner.className = 'result-banner';
+    
+    banner.style.animation = 'none';
+    void banner.offsetWidth;
+    banner.style.animation = '';
 
     if (raw.length !== 6) {
       banner.className = 'result-banner lose';
       banner.textContent = '⚠️ Cek nomor kupon! Harus 6 karakter.';
+      document.getElementById('couponInput').value = '';
+      document.getElementById('couponInput').focus();
       return;
     }
 
@@ -1041,8 +836,19 @@
     renumberHistory();
     renderHistory();
     saveStorage();
+
     document.getElementById('couponInput').value = '';
     document.getElementById('couponInput').focus();
+  }
+
+  function newQueue() {
+    if (currentQueueCount === 0) return;
+    currentQueue++;
+    currentQueueCount = 0;
+    updateQueueBadge();
+    history.unshift({ type: 'divider', queue: currentQueue });
+    renderHistory();
+    saveStorage();
   }
 
   function renumberHistory() {
@@ -1096,24 +902,10 @@
     XLSX.writeFile(wb, 'pemenang_kupon.xlsx');
   }
 
-  let isDark = false;
-  function toggleTheme() {
-    isDark = !isDark;
-    document.getElementById('app').className = isDark ? 'dark' : 'light';
-    const htmlElem = document.documentElement;
-    if (isDark) {
-      htmlElem.classList.remove('light-bg');
-      htmlElem.classList.add('dark-bg');
-    } else {
-      htmlElem.classList.remove('dark-bg');
-      htmlElem.classList.add('light-bg');
-    }
-  }
-
   function toggleFullscreen() {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(err => {
-        console.log(`Error: ${err.message}`);
+        console.log(`Error attempting fullscreen: ${err.message}`);
       });
     } else {
       document.exitFullscreen();
@@ -1128,7 +920,6 @@
   function applyZoom(val) {
     const inverse = 1 / val;
     appEl.style.transform = `scale(${val})`;
-    appEl.style.transformOrigin = 'top left';
     appEl.style.width = (inverse * 100) + 'vw';
     appEl.style.height = (inverse * 100) + 'vh';
   }
@@ -1136,7 +927,7 @@
   const savedZoom = localStorage.getItem('appZoom');
   if (savedZoom) {
     const zoom = parseFloat(savedZoom);
-    if (!isNaN(zoom) && zoom >= 1 && zoom <= 2) {
+    if (!isNaN(zoom) && zoom >= 0.8 && zoom <= 1.5) {
       zoomSlider.value = zoom;
       zoomValueSpan.textContent = Math.round(zoom * 100) + '%';
       applyZoom(zoom);
@@ -1151,16 +942,52 @@
 
   document.documentElement.classList.add('light-bg');
 
+  loadStorage();
+  syncMainUploadBtn();
+  updateQueueBadge();
+  if (history.length > 0) renderHistory();
+
+  // Upload handler
+  document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const wb   = XLSX.read(ev.target.result, { type: 'binary' });
+        const ws   = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+        couponDB = {};
+        let count = 0;
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          if (!row || !row[0]) continue;
+          const code  = String(row[0]).trim().toUpperCase();
+          const prize = row[1] ? String(row[1]).trim() : 'Hadiah';
+          couponDB[code] = prize;
+          count++;
+        }
+        localStorage.setItem('kupon_filename', file.name);
+        syncMainUploadBtn();
+        saveStorage();
+      } catch(err) {
+        alert('Gagal membaca file. Format: kolom A = Nomor Kupon, kolom B = Hadiah');
+      }
+    };
+    reader.readAsBinaryString(file);
+    this.value = '';
+  });
+
   // Overlay
   (function initOverlay() {
-    const overlay      = document.getElementById('fullscreen-overlay');
-    const confirmBtn   = document.getElementById('confirmFullscreenBtn');
-    const overlayInput = document.getElementById('overlayFileInput');
-    const uploadZone   = document.getElementById('overlayUploadZone');
-    const fileInfo     = document.getElementById('overlayFileInfo');
-    const kuponCount   = document.getElementById('overlayKuponCount');
-    const fileNameEl   = document.getElementById('overlayFileName');
-    const reuploadBtn  = document.getElementById('overlayReuploadBtn');
+    const overlay       = document.getElementById('fullscreen-overlay');
+    const confirmBtn    = document.getElementById('confirmFullscreenBtn');
+    const overlayInput  = document.getElementById('overlayFileInput');
+    const uploadZone    = document.getElementById('overlayUploadZone');
+    const fileInfo      = document.getElementById('overlayFileInfo');
+    const kuponCount    = document.getElementById('overlayKuponCount');
+    const fileNameEl    = document.getElementById('overlayFileName');
+    const reuploadBtn   = document.getElementById('overlayReuploadBtn');
 
     function refreshOverlayState() {
       const count = Object.keys(couponDB).length;
